@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sponsrr — Skip the Noise. Find your Sponsrr.</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --black:#080808;
+  --white:#f0ede8;
+  --acid:#c8ff00;
+  --orange:#ff4d00;
+  --card:#111111;
+  --mid:#0f0f0f;
+  --muted:rgba(240,237,232,0.45);
+  --border:rgba(240,237,232,0.08);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+}
+
+/* NOISE */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:9999;
+  opacity:.4;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.4rem 2.5rem;
+  z-index:200;
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  background:rgba(8,8,8,0.75);
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:1.35rem;
+  letter-spacing:-0.05em;
+  color:var(--white);
+}
+.logo em{font-style:normal;color:var(--acid)}
+.nav-links{
+  display:flex;align-items:center;gap:2rem;
+  list-style:none;
+}
+.nav-links a{
+  color:var(--muted);text-decoration:none;
+  font-size:0.84rem;font-weight:500;
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--white)}
+.btn-pill{
+  background:var(--acid);color:var(--black);
+  padding:.55rem 1.25rem;border-radius:100px;
+  font-weight:700;font-size:.82rem;
+  text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 0 20px rgba(200,255,0,.2);
+}
+.btn-pill:hover{transform:scale(1.04);box-shadow:0 0 30px rgba(200,255,0,.35)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  padding:9rem 2.5rem 5rem;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:hidden;
+}
+
+/* big ambient glow */
+.hero-glow{
+  position:absolute;
+  width:900px;height:900px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(200,255,0,.11) 0%,transparent 65%);
+  top:-200px;right:-250px;
+  pointer-events:none;
+  animation:pulse 7s ease-in-out infinite;
+}
+.hero-glow2{
+  position:absolute;
+  width:500px;height:500px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,77,0,.09) 0%,transparent 65%);
+  bottom:0;left:-100px;
+  pointer-events:none;
+  animation:pulse 9s ease-in-out infinite reverse;
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:.5rem;
+  border:1px solid rgba(200,255,0,.22);
+  background:rgba(200,255,0,.07);
+  padding:.38rem 1rem;border-radius:100px;
+  font-size:.75rem;font-weight:600;
+  color:var(--acid);letter-spacing:.04em;
+  margin-bottom:2rem;width:fit-content;
+  animation:up .6s ease both;
+}
+.blink{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--acid);
+  animation:blink 1.6s ease infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* HEADLINE */
+.hero-h1{
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(3.2rem,9vw,8.5rem);
+  line-height:.93;
+  letter-spacing:-0.045em;
+  max-width:1000px;
+  animation:up .65s .08s ease both;
+}
+.hero-h1 .noise{
+  color:var(--muted);
+  position:relative;display:inline-block;
+}
+/* animated strikethrough */
+.hero-h1 .noise::after{
+  content:'';
+  position:absolute;
+  left:0;right:100%;top:52%;
+  height:4px;background:var(--orange);
+  border-radius:2px;
+  animation:strike 1s .9s ease forwards;
+}
+@keyframes strike{to{right:0}}
+.hero-h1 .loud{color:var(--acid)}
+
+.hero-sub{
+  font-size:1.05rem;
+  color:var(--muted);
+  max-width:460px;
+  line-height:1.65;
+  margin-top:2rem;
+  font-weight:300;
+  animation:up .65s .16s ease both;
+}
+
+.hero-ctas{
+  display:flex;align-items:center;gap:1rem;
+  margin-top:2.5rem;flex-wrap:wrap;
+  animation:up .65s .24s ease both;
+}
+.btn-big{
+  background:var(--acid);color:var(--black);
+  padding:.95rem 2.2rem;border-radius:100px;
+  font-weight:700;font-size:.95rem;
+  text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 0 40px rgba(200,255,0,.25);
+  display:inline-flex;align-items:center;gap:.5rem;
+}
+.btn-big:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(200,255,0,.4)}
+.btn-big .arr{transition:transform .2s}
+.btn-big:hover .arr{transform:translateX(5px)}
+.btn-line{
+  color:var(--white);padding:.95rem 1.6rem;
+  border-radius:100px;font-weight:500;font-size:.9rem;
+  text-decoration:none;
+  border:1px solid var(--border);
+  transition:border-color .2s,background .2s;
+}
+.btn-line:hover{border-color:rgba(240,237,232,.25);background:rgba(240,237,232,.04)}
+
+.hero-numbers{
+  display:flex;gap:3rem;flex-wrap:wrap;
+  margin-top:4.5rem;padding-top:3rem;
+  border-top:1px solid var(--border);
+  animation:up .65s .32s ease both;
+}
+.num-block{}
+.num-big{
+  font-family:'Syne',sans-serif;
+  font-size:2.2rem;font-weight:800;
+  color:var(--acid);letter-spacing:-0.05em;
+  line-height:1;
+}
+.num-label{
+  font-size:.78rem;color:var(--muted);
+  margin-top:.3rem;
+}
+
+@keyframes up{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ── TICKER ── */
+.ticker-wrap{
+  background:var(--acid);
+  padding:.7rem 0;
+  overflow:hidden;white-space:nowrap;
+}
+.ticker-track{
+  display:inline-flex;
+  animation:tick 28s linear infinite;
+}
+.ticker-track:hover{animation-play-state:paused}
+.tick-item{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:.78rem;
+  color:var(--black);
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:0 2rem;
+  display:inline-flex;align-items:center;gap:1rem;
+}
+.tick-sep{width:4px;height:4px;background:rgba(0,0,0,.35);border-radius:50%}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SECTION BASE ── */
+.section{padding:7rem 2.5rem;max-width:1200px;margin:0 auto}
+.section-dark{background:var(--mid)}
+.section-dark .section{max-width:1200px;margin:0 auto}
+
+.eyebrow{
+  font-size:.72rem;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acid);margin-bottom:1.2rem;
+}
+.section-h2{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2rem,4vw,3.8rem);
+  font-weight:800;letter-spacing:-.04em;
+  line-height:1.02;max-width:680px;
+}
+.section-h2 em{font-style:normal;color:var(--acid)}
+
+/* ── FEATURES ── */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:1rem;margin-top:3.5rem;
+}
+.feat{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:2rem;
+  transition:border-color .3s,transform .3s;
+  position:relative;overflow:hidden;
+}
+.feat::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(200,255,0,.05) 0%,transparent 55%);
+  opacity:0;transition:opacity .3s;
+}
+.feat:hover{border-color:rgba(200,255,0,.25);transform:translateY(-5px)}
+.feat:hover::before{opacity:1}
+.feat-icon{font-size:1.9rem;margin-bottom:1.3rem}
+.feat h3{
+  font-family:'Syne',sans-serif;
+  font-size:1.05rem;font-weight:700;
+  letter-spacing:-.025em;margin-bottom:.6rem;
+}
+.feat p{
+  font-size:.86rem;color:var(--muted);
+  line-height:1.7;font-weight:300;
+}
+.feat-tag{
+  display:inline-block;
+  background:rgba(200,255,0,.1);
+  color:var(--acid);
+  font-size:.65rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  padding:.22rem .65rem;border-radius:100px;
+  margin-top:1.2rem;
+}
+.feat-tag.new{background:rgba(255,77,0,.12);color:var(--orange)}
+
+/* ── SPONSRR SCORE ── */
+.score-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:5rem;align-items:center;
+}
+.score-left{}
+.score-desc{
+  font-size:.95rem;color:var(--muted);
+  line-height:1.7;font-weight:300;
+  margin-top:1.5rem;max-width:420px;
+}
+.score-bullets{
+  list-style:none;display:flex;
+  flex-direction:column;gap:.75rem;
+  margin-top:2rem;
+}
+.score-bullets li{
+  font-size:.85rem;color:var(--muted);
+  display:flex;align-items:flex-start;gap:.75rem;
+  line-height:1.5;
+}
+.score-bullets li::before{
+  content:'✦';color:var(--acid);
+  font-size:.65rem;margin-top:.2rem;
+  flex-shrink:0;
+}
+
+/* Score card visual */
+.score-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:2.5rem;
+  position:relative;overflow:hidden;
+}
+.score-card::before{
+  content:'';position:absolute;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,255,0,.1) 0%,transparent 65%);
+  top:-100px;right:-100px;pointer-events:none;
+}
+.score-card-label{
+  font-size:.72rem;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1.5rem;
+}
+.score-ring-wrap{
+  display:flex;justify-content:center;
+  margin-bottom:2rem;
+  position:relative;
+}
+.ring-svg{transform:rotate(-90deg);width:160px;height:160px}
+.ring-bg{fill:none;stroke:rgba(240,237,232,.07);stroke-width:10}
+.ring-fg{
+  fill:none;stroke:var(--acid);stroke-width:10;
+  stroke-linecap:round;
+  stroke-dasharray:440;stroke-dashoffset:110;
+  filter:drop-shadow(0 0 10px rgba(200,255,0,.6));
+  animation:ringfill 2s .5s ease both;
+}
+@keyframes ringfill{from{stroke-dashoffset:440}to{stroke-dashoffset:110}}
+.ring-text{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.ring-num{
+  font-family:'Syne',sans-serif;
+  font-size:2.8rem;font-weight:800;
+  color:var(--acid);letter-spacing:-.06em;
+  line-height:1;
+}
+.ring-lbl{
+  font-size:.65rem;color:var(--muted);
+  letter-spacing:.08em;text-transform:uppercase;
+  margin-top:.2rem;
+}
+
+.score-factors{display:flex;flex-direction:column;gap:1rem}
+.factor-row{display:flex;align-items:center;gap:.8rem}
+.factor-name{
+  font-size:.75rem;color:var(--muted);
+  width:90px;flex-shrink:0;
+}
+.factor-track{
+  flex:1;height:5px;
+  background:rgba(240,237,232,.07);
+  border-radius:100px;overflow:hidden;
+}
+.factor-fill{
+  height:100%;border-radius:100px;
+  background:var(--acid);
+  animation:fill 1.5s ease both;
+}
+@keyframes fill{from{width:0 !important}}
+.factor-pct{
+  font-size:.72rem;color:var(--muted);
+  width:30px;text-align:right;flex-shrink:0;
+}
+
+/* ── PRICING ── */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1rem;margin-top:3.5rem;
+}
+@media(max-width:900px){.pricing-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.pricing-grid{grid-template-columns:1fr}}
+
+.price-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;padding:2rem 1.7rem;
+  position:relative;
+  transition:transform .3s,border-color .3s;
+}
+.price-card:hover{transform:translateY(-5px)}
+.price-card.best{
+  border-color:rgba(200,255,0,.4);
+  background:linear-gradient(160deg,rgba(200,255,0,.07) 0%,var(--card) 55%);
+}
+.best-badge{
+  position:absolute;top:-13px;left:50%;
+  transform:translateX(-50%);
+  background:var(--acid);color:var(--black);
+  font-size:.62rem;font-weight:800;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:.28rem .8rem;border-radius:100px;
+  white-space:nowrap;
+}
+.pc-period{
+  font-size:.7rem;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.9rem;
+}
+.pc-price{
+  font-family:'Syne',sans-serif;
+  font-size:2.6rem;font-weight:800;
+  letter-spacing:-.05em;line-height:1;
+}
+.pc-price sup{
+  font-size:1.1rem;vertical-align:super;
+  letter-spacing:0;
+}
+.pc-price sub{
+  font-size:.85rem;font-weight:400;
+  color:var(--muted);vertical-align:baseline;
+  letter-spacing:0;
+}
+.pc-equiv{
+  font-size:.75rem;color:var(--muted);
+  margin-top:.4rem;
+}
+.pc-save{
+  display:inline-block;
+  background:rgba(255,77,0,.14);
+  color:var(--orange);
+  font-size:.68rem;font-weight:700;
+  padding:.2rem .6rem;border-radius:100px;
+  margin-top:.7rem;
+}
+.pc-divider{
+  height:1px;background:var(--border);
+  margin:1.5rem 0;
+}
+.pc-feats{
+  list-style:none;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.pc-feats li{
+  font-size:.82rem;color:var(--muted);
+  display:flex;align-items:flex-start;gap:.5rem;
+  line-height:1.5;
+}
+.pc-feats li::before{
+  content:'✓';color:var(--acid);
+  font-weight:700;font-size:.75rem;
+  flex-shrink:0;margin-top:.1rem;
+}
+.pc-btn{
+  display:block;text-align:center;
+  margin-top:1.5rem;
+  padding:.75rem;border-radius:100px;
+  font-weight:600;font-size:.84rem;
+  text-decoration:none;
+  border:1px solid var(--border);
+  color:var(--white);
+  transition:all .2s;
+}
+.price-card.best .pc-btn{
+  background:var(--acid);color:var(--black);
+  border-color:var(--acid);
+}
+.pc-btn:hover{opacity:.8}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1rem;margin-top:3.5rem;
+}
+@media(max-width:768px){.testi-grid{grid-template-columns:1fr}}
+.testi{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;padding:1.8rem;
+}
+.testi-stars{
+  color:var(--acid);font-size:.75rem;
+  letter-spacing:.1em;margin-bottom:1rem;
+}
+.testi-quote{
+  font-size:.9rem;color:rgba(240,237,232,.65);
+  line-height:1.7;font-weight:300;
+}
+.testi-by{
+  display:flex;align-items:center;
+  gap:.75rem;margin-top:1.5rem;
+}
+.testi-av{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,var(--acid),var(--orange));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:.75rem;
+  color:var(--black);flex-shrink:0;
+}
+.testi-nm{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:.85rem;
+  letter-spacing:-.02em;
+}
+.testi-role{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+
+/* ── FINAL CTA ── */
+.final-cta{
+  padding:9rem 2.5rem;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.final-cta::before{
+  content:'';position:absolute;
+  width:900px;height:900px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,255,0,.09) 0%,transparent 60%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.final-cta h2{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.8rem,7vw,6.5rem);
+  font-weight:800;
+  letter-spacing:-.045em;
+  line-height:.95;
+  max-width:850px;margin:0 auto 2rem;
+}
+.final-cta h2 em{font-style:normal;color:var(--acid)}
+.final-cta p{
+  font-size:1rem;color:var(--muted);
+  margin-bottom:2.5rem;
+}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:2rem 2.5rem;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+}
+.foot-logo{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:1.1rem;
+  letter-spacing:-.04em;
+}
+.foot-logo em{font-style:normal;color:var(--acid)}
+footer p{font-size:.75rem;color:rgba(240,237,232,.28)}
+.foot-links{
+  display:flex;gap:1.5rem;list-style:none;
+}
+.foot-links a{
+  font-size:.75rem;color:rgba(240,237,232,.35);
+  text-decoration:none;transition:color .2s;
+}
+.foot-links a:hover{color:var(--white)}
+
+/* ── REVEAL ── */
+.reveal{
+  opacity:0;transform:translateY(32px);
+  transition:opacity .7s ease,transform .7s ease;
+}
+.reveal.on{opacity:1;transform:translateY(0)}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav .nav-links{display:none}
+  .score-wrap{grid-template-columns:1fr;gap:3rem}
+  .hero-numbers{gap:2rem}
+  .hero{padding-bottom:3rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Sponsrr<em>.</em></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#score">Sponsrr Score</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#" class="btn-pill">Get Started →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-eyebrow">
+    <div class="blink"></div>
+    UK's #1 visa sponsorship platform
+  </div>
+
+  <h1 class="hero-h1">
+    Skip the <span class="noise">noise.</span><br>
+    Find your <span class="loud">Sponsrr.</span>
+  </h1>
+
+  <p class="hero-sub">
+    Every job, every company — 100% verified UK visa sponsors. No guesswork. No LinkedIn rabbit holes. Just the roles that will actually get you here.
+  </p>
+
+  <div class="hero-ctas">
+    <a href="#" class="btn-big">Find my sponsor <span class="arr">→</span></a>
+    <a href="#features" class="btn-line">See how it works</a>
+  </div>
+
+  <div class="hero-numbers">
+    <div class="num-block">
+      <div class="num-big">50K+</div>
+      <div class="num-label">Licensed UK sponsors</div>
+    </div>
+    <div class="num-block">
+      <div class="num-big">99p</div>
+      <div class="num-label">From per week</div>
+    </div>
+    <div class="num-block">
+      <div class="num-big">0</div>
+      <div class="num-label">Unverified listings. Ever.</div>
+    </div>
+    <div class="num-block">
+      <div class="num-big">3 min</div>
+      <div class="num-label">Avg. time to first match</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="tick-item">Visa Verified <span class="tick-sep"></span></span>
+    <span class="tick-item">CV Builder <span class="tick-sep"></span></span>
+    <span class="tick-item">Sponsrr Score <span class="tick-sep"></span></span>
+    <span class="tick-item">Salary Checker <span class="tick-sep"></span></span>
+    <span class="tick-item">Job Alerts <span class="tick-sep"></span></span>
+    <span class="tick-item">Company Insights <span class="tick-sep"></span></span>
+    <span class="tick-item">Application Tracker <span class="tick-sep"></span></span>
+    <span class="tick-item">Home Office Data <span class="tick-sep"></span></span>
+    <span class="tick-item">Visa Verified <span class="tick-sep"></span></span>
+    <span class="tick-item">CV Builder <span class="tick-sep"></span></span>
+    <span class="tick-item">Sponsrr Score <span class="tick-sep"></span></span>
+    <span class="tick-item">Salary Checker <span class="tick-sep"></span></span>
+    <span class="tick-item">Job Alerts <span class="tick-sep"></span></span>
+    <span class="tick-item">Company Insights <span class="tick-sep"></span></span>
+    <span class="tick-item">Application Tracker <span class="tick-sep"></span></span>
+    <span class="tick-item">Home Office Data <span class="tick-sep"></span></span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div id="features">
+<div class="section reveal">
+  <div class="eyebrow">What you get</div>
+  <h2 class="section-h2">Built different.<br><em>For internationals</em><br>who are done waiting.</h2>
+
+  <div class="features-grid">
+
+    <div class="feat">
+      <div class="feat-icon">🔍</div>
+      <h3>Verified Sponsor Directory</h3>
+      <p>Every company on Sponsrr is cross-referenced with the Home Office register of licensed sponsors. If they're here, they can sponsor. Simple.</p>
+      <span class="feat-tag">Core</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">⚡</div>
+      <h3>Real-time Job Feed</h3>
+      <p>Live listings filtered by sponsor status, salary threshold, and your occupation code. No refreshing LinkedIn at midnight wondering if they sponsor.</p>
+      <span class="feat-tag">Core</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">🏆</div>
+      <h3>Your Sponsrr Score</h3>
+      <p>A personalised match score that shows how likely you are to get sponsored — based on your role, sector, experience, and salary. Only on Sponsrr.</p>
+      <span class="feat-tag new">Only on Sponsrr</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">📄</div>
+      <h3>AI CV Builder</h3>
+      <p>Build a visa-optimised CV in minutes. Our AI highlights the experience sponsors actually care about and flags anything that could get you filtered out.</p>
+      <span class="feat-tag new">Exclusive</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">💷</div>
+      <h3>Salary Threshold Checker</h3>
+      <p>Instantly check if a job meets the Skilled Worker visa salary requirement. Know before you apply — don't waste your time on roles that won't qualify.</p>
+      <span class="feat-tag new">Exclusive</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">🔔</div>
+      <h3>Smart Job Alerts</h3>
+      <p>Set your role, sector, and location. We ping you the moment a verified sponsor posts a job that matches. Be first. Be fast.</p>
+      <span class="feat-tag">Core</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">🏢</div>
+      <h3>Company Deep Dives</h3>
+      <p>See how many CoS a company has issued, which roles they sponsor most, their average sponsored salary, and how active they've been recently.</p>
+      <span class="feat-tag new">Exclusive</span>
+    </div>
+
+    <div class="feat">
+      <div class="feat-icon">📊</div>
+      <h3>Application Tracker</h3>
+      <p>Track every application in one clean board. Know what's live, what needs a follow-up, and what to let go. Stay organised. Stay focused.</p>
+      <span class="feat-tag">Core</span>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- SPONSRR SCORE -->
+<div id="score" class="section-dark">
+<div class="section reveal">
+  <div class="score-wrap">
+    <div class="score-left">
+      <div class="eyebrow">Only on Sponsrr</div>
+      <h2 class="section-h2">Your <em>Sponsrr Score.</em><br>Know your chances before you apply.</h2>
+      <p class="score-desc">
+        Stop sending CVs into a black hole. Your Sponsrr Score analyses your profile — role, sector, salary level, experience — and tells you exactly how likely you are to land a sponsored role. Then it tells you how to improve it.
+      </p>
+      <ul class="score-bullets">
+        <li>Built from real Home Office sponsorship data</li>
+        <li>Updates as you improve your profile</li>
+        <li>Sector-specific scoring — not one-size-fits-all</li>
+        <li>Shareable — flex it on LinkedIn</li>
+      </ul>
+    </div>
+
+    <div class="score-card">
+      <div class="score-card-label">Your Sponsrr Score</div>
+      <div class="score-ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 160 160">
+          <circle class="ring-bg" cx="80" cy="80" r="70"/>
+          <circle class="ring-fg" cx="80" cy="80" r="70"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num">74</div>
+          <div class="ring-lbl">/ 100</div>
+        </div>
+      </div>
+
+      <div class="score-factors">
+        <div class="factor-row">
+          <div class="factor-name">Sector</div>
+          <div class="factor-track"><div class="factor-fill" style="width:88%"></div></div>
+          <div class="factor-pct">88%</div>
+        </div>
+        <div class="factor-row">
+          <div class="factor-name">Salary</div>
+          <div class="factor-track"><div class="factor-fill" style="width:72%"></div></div>
+          <div class="factor-pct">72%</div>
+        </div>
+        <div class="factor-row">
+          <div class="factor-name">Experience</div>
+          <div class="factor-track"><div class="factor-fill" style="width:65%"></div></div>
+          <div class="factor-pct">65%</div>
+        </div>
+        <div class="factor-row">
+          <div class="factor-name">CV Match</div>
+          <div class="factor-track"><div class="factor-fill" style="width:80%"></div></div>
+          <div class="factor-pct">80%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PRICING -->
+<div id="pricing">
+<div class="section reveal">
+  <div class="eyebrow">Pricing</div>
+  <h2 class="section-h2">Less than your<br><em>daily coffee.</em></h2>
+
+  <div class="pricing-grid">
+
+    <div class="price-card">
+      <div class="pc-period">Weekly</div>
+      <div class="pc-price"><sup>£</sup>0.99<sub>/wk</sub></div>
+      <div class="pc-equiv">Full flexibility</div>
+      <div class="pc-divider"></div>
+      <ul class="pc-feats">
+        <li>Verified job listings</li>
+        <li>Sponsor directory</li>
+        <li>Basic job alerts</li>
+        <li>Sponsrr Score</li>
+      </ul>
+      <a href="#" class="pc-btn">Start weekly</a>
+    </div>
+
+    <div class="price-card">
+      <div class="pc-period">Monthly</div>
+      <div class="pc-price"><sup>£</sup>3.49<sub>/mo</sub></div>
+      <div class="pc-equiv">≈ 87p per week</div>
+      <div class="pc-save">Save 12%</div>
+      <div class="pc-divider"></div>
+      <ul class="pc-feats">
+        <li>Everything in Weekly</li>
+        <li>AI CV Builder</li>
+        <li>Salary checker</li>
+        <li>Application tracker</li>
+      </ul>
+      <a href="#" class="pc-btn">Start monthly</a>
+    </div>
+
+    <div class="price-card best">
+      <div class="best-badge">Most popular</div>
+      <div class="pc-period">Quarterly</div>
+      <div class="pc-price"><sup>£</sup>9.99<sub>/qtr</sub></div>
+      <div class="pc-equiv">≈ 77p per week</div>
+      <div class="pc-save">Save 24%</div>
+      <div class="pc-divider"></div>
+      <ul class="pc-feats">
+        <li>Everything in Monthly</li>
+        <li>Company deep dives</li>
+        <li>Priority alerts</li>
+        <li>Profile badge</li>
+      </ul>
+      <a href="#" class="pc-btn">Start quarterly</a>
+    </div>
+
+    <div class="price-card">
+      <div class="pc-period">Annually</div>
+      <div class="pc-price"><sup>£</sup>34.99<sub>/yr</sub></div>
+      <div class="pc-equiv">≈ 67p per week</div>
+      <div class="pc-save">Save 32%</div>
+      <div class="pc-divider"></div>
+      <ul class="pc-feats">
+        <li>Everything in Quarterly</li>
+        <li>1-on-1 CV review</li>
+        <li>Early feature access</li>
+        <li>Sponsrr verified badge</li>
+      </ul>
+      <a href="#" class="pc-btn">Start annually</a>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="section-dark">
+<div class="section reveal">
+  <div class="eyebrow">Real people. Real results.</div>
+  <h2 class="section-h2">They skipped<br>the noise. <em>You can too.</em></h2>
+
+  <div class="testi-grid">
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"I wasted six months on LinkedIn applying to jobs that 'might consider' sponsorship. Found my role in three weeks on Sponsrr. Genuinely life-changing."</p>
+      <div class="testi-by">
+        <div class="testi-av">AK</div>
+        <div>
+          <div class="testi-nm">Arjun K.</div>
+          <div class="testi-role">Software Engineer · Mumbai → London</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"The Sponsrr Score told me my profile was weak on salary threshold. I negotiated my offer up before signing. That feature alone is worth the subscription."</p>
+      <div class="testi-by">
+        <div class="testi-av">FM</div>
+        <div>
+          <div class="testi-nm">Fatima M.</div>
+          <div class="testi-role">Marketing Manager · Lagos → Manchester</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"The company insights showed me which firms were actively issuing CoS certificates. I targeted them specifically. Got three interviews in my first week."</p>
+      <div class="testi-by">
+        <div class="testi-av">JL</div>
+        <div>
+          <div class="testi-nm">Ji-ho L.</div>
+          <div class="testi-role">Data Analyst · Seoul → Birmingham</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- FINAL CTA -->
+<div class="final-cta reveal">
+  <h2>Your visa.<br>Their job.<br><em>Let's go.</em></h2>
+  <p>Join thousands of internationals who stopped guessing and started getting sponsored.</p>
+  <a href="#" class="btn-big" style="display:inline-flex;margin:0 auto">
+    Find my Sponsrr <span class="arr">→</span>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">Sponsrr<em>.</em></div>
+  <ul class="foot-links">
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Terms</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <p>© 2025 Sponsrr. Built for internationals.</p>
+</footer>
+
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on') })
+}, {threshold: 0.12})
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+</script>
+
+</body>
+</html>
