@@ -4,6 +4,7 @@ import Jobs from './pages/Jobs';
 import Companies from './pages/Companies';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
@@ -13,7 +14,8 @@ function App() {
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/companies" element={<Companies />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/signup" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
@@ -30,24 +32,57 @@ function Home() {
   ];
 
   const plans = [
-    { period:'Weekly', price:'0.99', per:'wk', equiv:'Full flexibility', save:null, features:['Verified job listings','Sponsor directory','Basic job alerts','Sponsrr Score'], best:false },
-    { period:'Monthly', price:'3.49', per:'mo', equiv:'≈ 87p per week', save:'Save 12%', features:['Everything in Weekly','AI CV Builder','Salary checker','Application tracker'], best:false },
-    { period:'Quarterly', price:'9.99', per:'qtr', equiv:'≈ 77p per week', save:'Save 24%', features:['Everything in Monthly','Company deep dives','Priority alerts','Profile badge'], best:true },
-    { period:'Annually', price:'34.99', per:'yr', equiv:'≈ 67p per week', save:'Save 32%', features:['Everything in Quarterly','1-on-1 CV review','Early feature access','Sponsrr verified badge'], best:false },
+    {
+      period:'Weekly', price:'0.99', per:'wk', equiv:'Full flexibility', save:null, best:false,
+      features:[
+        'Job cards from verified sponsors',
+        'Sponsor directory — browse free',
+        'Visa Eligibility Calculator',
+        'Sponsrr Score',
+        'Basic job alerts',
+      ]
+    },
+    {
+      period:'Monthly', price:'3.49', per:'mo', equiv:'≈ 87p per week', save:'Save 12%', best:false,
+      features:[
+        'Everything in Weekly',
+        'Full job descriptions + apply',
+        'AI CV Builder',
+        'Salary threshold checker',
+        'Application tracker',
+      ]
+    },
+    {
+      period:'Quarterly', price:'9.99', per:'qtr', equiv:'≈ 77p per week', save:'Save 24%', best:true,
+      features:[
+        'Everything in Monthly',
+        'Company deep dives',
+        'Priority job alerts',
+        'Profile badge',
+      ]
+    },
+    {
+      period:'Annually', price:'34.99', per:'yr', equiv:'≈ 67p per week', save:'Save 32%', best:false,
+      features:[
+        'Everything in Quarterly',
+        '1-on-1 CV review',
+        'Early feature access',
+        'Sponsrr verified badge',
+      ]
+    },
   ];
 
   const features = [
-    { icon:'🔍', title:'Verified Sponsor Directory', desc:'Every company cross-referenced with the Home Office register. If they\'re here, they can sponsor.', tag:'Core', tagColor:'rgba(200,255,0,0.1)', tagText:'#c8ff00' },
-    { icon:'⚡', title:'Real-time Job Feed', desc:'Live listings filtered by sponsor status, salary threshold, and your occupation code.', tag:'Core', tagColor:'rgba(200,255,0,0.1)', tagText:'#c8ff00' },
+    { icon:'🔍', title:'Verified Sponsor Directory', desc:'Every company cross-referenced with the Home Office register. If they\'re here, they can sponsor.', tag:'Core', tagColor:'rgba(240,237,232,0.08)', tagText:'rgba(240,237,232,0.5)' },
+    { icon:'⚡', title:'Real-time Job Feed', desc:'Live listings filtered by sponsor status, salary threshold, and your occupation code.', tag:'Core', tagColor:'rgba(240,237,232,0.08)', tagText:'rgba(240,237,232,0.5)' },
     { icon:'🏆', title:'Sponsrr Score', desc:'A personalised match score based on your role, sector, experience, and salary. Only on Sponsrr.', tag:'Only on Sponsrr', tagColor:'rgba(255,77,0,0.12)', tagText:'#ff4d00' },
     { icon:'📄', title:'AI CV Builder', desc:'Build a visa-optimised CV in minutes. Highlights what sponsors actually care about.', tag:'Exclusive', tagColor:'rgba(255,77,0,0.12)', tagText:'#ff4d00' },
     { icon:'💷', title:'Salary Threshold Checker', desc:'Instantly check if a job meets the Skilled Worker visa salary requirement.', tag:'Exclusive', tagColor:'rgba(255,77,0,0.12)', tagText:'#ff4d00' },
-    { icon:'🔔', title:'Smart Job Alerts', desc:'We ping you the moment a verified sponsor posts a matching job. Be first. Be fast.', tag:'Core', tagColor:'rgba(200,255,0,0.1)', tagText:'#c8ff00' },
+    { icon:'🔔', title:'Smart Job Alerts', desc:'We ping you the moment a verified sponsor posts a matching job. Be first. Be fast.', tag:'Core', tagColor:'rgba(240,237,232,0.08)', tagText:'rgba(240,237,232,0.5)' },
     { icon:'🏢', title:'Company Deep Dives', desc:'See CoS history, sponsor activity, average salaries and more for any company.', tag:'Exclusive', tagColor:'rgba(255,77,0,0.12)', tagText:'#ff4d00' },
-    { icon:'📊', title:'Application Tracker', desc:'Track every application in one clean board. Stay organised. Stay focused.', tag:'Core', tagColor:'rgba(200,255,0,0.1)', tagText:'#c8ff00' },
+    { icon:'📊', title:'Application Tracker', desc:'Track every application in one clean board. Stay organised. Stay focused. Stay ahead.', tag:'Core', tagColor:'rgba(240,237,232,0.08)', tagText:'rgba(240,237,232,0.5)' },
   ];
 
-  // Reordered stats
   const stats = [
     { num:'121,000+', label:'Licensed UK sponsors' },
     { num:'19', label:'Sectors covered' },
@@ -65,14 +100,11 @@ function Home() {
         .blink { animation: blink 1.6s ease infinite; }
         .strike { position:absolute; left:0; right:0; top:52%; height:5px; background:#ff4d00; border-radius:3px; transform-origin:left; animation:strike 1s 0.8s ease forwards; transform:scaleX(0); display:block; }
         .feat-card:hover { border-color: rgba(200,255,0,0.25) !important; transform: translateY(-3px); }
-
-        /* Stats desktop -- 4 in a row */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border: 1px solid rgba(240,237,232,0.08); border-radius: 16px; overflow: hidden; margin-top: 3.5rem; }
         .stat-box-0 { background: rgba(240,237,232,0.03); border-right: 1px solid rgba(240,237,232,0.08); }
         .stat-box-1 { background: transparent; border-right: 1px solid rgba(240,237,232,0.08); }
         .stat-box-2 { background: rgba(240,237,232,0.03); border-right: 1px solid rgba(240,237,232,0.08); }
         .stat-box-3 { background: transparent; }
-
         @media(max-width:768px) {
           .hero-title { font-size: 2.6rem !important; line-height: 1.05 !important; }
           .hero-pad { padding: 5rem 1.5rem 2rem !important; }
@@ -87,8 +119,6 @@ function Home() {
           .section-pad { padding: 3.5rem 1.5rem !important; }
           .hero-buttons { flex-direction: column !important; }
           .hero-buttons a { text-align: center !important; }
-
-          /* Stats mobile -- 2x2 checkerboard */
           .stats-grid { grid-template-columns: 1fr 1fr !important; }
           .stat-box-0 { background: rgba(240,237,232,0.04) !important; border-right: 1px solid rgba(240,237,232,0.08) !important; border-bottom: 1px solid rgba(240,237,232,0.08) !important; }
           .stat-box-1 { background: transparent !important; border-right: none !important; border-bottom: 1px solid rgba(240,237,232,0.08) !important; }
@@ -101,14 +131,14 @@ function Home() {
         }
       `}</style>
 
-      {/* NAV -- landing page only: logo + Get Started */}
+      {/* NAV -- landing page: logo + Get Started only */}
       <nav style={{ position:'fixed', top:0, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'1.2rem 2rem', background:'rgba(8,8,8,0.95)', backdropFilter:'blur(16px)', borderBottom:'1px solid rgba(240,237,232,0.08)', zIndex:1000 }}>
         <a href="/" style={{ textDecoration:'none' }}>
           <div style={{ fontFamily:'Syne, sans-serif', fontWeight:800, fontSize:'1.3rem', letterSpacing:'-0.04em', color:'#f0ede8' }}>
             Sponsrr<span style={{ color:'#c8ff00' }}>.</span>
           </div>
         </a>
-        <a href="/signup" style={{ background:'#c8ff00', color:'#080808', padding:'0.5rem 1.4rem', borderRadius:'100px', fontWeight:700, fontSize:'0.85rem', textDecoration:'none', whiteSpace:'nowrap' }}>
+        <a href="/login" style={{ background:'#c8ff00', color:'#080808', padding:'0.5rem 1.4rem', borderRadius:'100px', fontWeight:700, fontSize:'0.85rem', textDecoration:'none', whiteSpace:'nowrap' }}>
           Get Started
         </a>
       </nav>
@@ -141,7 +171,7 @@ function Home() {
             <a href="#features" style={{ color:'#f0ede8', padding:'0.9rem 1.5rem', borderRadius:'100px', fontWeight:500, fontSize:'0.9rem', textDecoration:'none', border:'1px solid rgba(240,237,232,0.15)' }}>See how it works</a>
           </div>
 
-          {/* STATS -- checkerboard */}
+          {/* STATS */}
           <div className="stats-grid">
             {stats.map((s, i) => (
               <div key={s.num} className={`stat-box-${i}`} style={{ padding:'2rem 1rem', textAlign:'center' }}>
@@ -235,10 +265,12 @@ function Home() {
           The unfair advantage.<br /><span style={{ color:'#c8ff00' }}>Priced fairly.</span>
         </h2>
 
+        {/* Desktop */}
         <div className="price-desktop" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1rem' }}>
           {plans.map(p => <PriceCard key={p.period} p={p} />)}
         </div>
 
+        {/* Mobile carousel */}
         <div className="price-mobile">
           <div style={{ display:'flex', justifyContent:'center', gap:'0.5rem', marginBottom:'1.2rem' }}>
             {plans.map((p,i) => (
@@ -247,9 +279,9 @@ function Home() {
           </div>
           <PriceCard p={plans[priceIndex]} />
           <div style={{ display:'flex', justifyContent:'space-between', marginTop:'1rem' }}>
-            <button onClick={() => setPriceIndex(i => Math.max(0, i-1))} disabled={priceIndex === 0} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: priceIndex === 0 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: priceIndex === 0 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>← Prev</button>
+            <button onClick={() => setPriceIndex(i => Math.max(0, i-1))} disabled={priceIndex===0} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: priceIndex===0 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: priceIndex===0 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>← Prev</button>
             <span style={{ fontSize:'0.78rem', color:'rgba(240,237,232,0.4)', alignSelf:'center' }}>{plans[priceIndex].period}</span>
-            <button onClick={() => setPriceIndex(i => Math.min(plans.length-1, i+1))} disabled={priceIndex === plans.length-1} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: priceIndex === plans.length-1 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: priceIndex === plans.length-1 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>Next →</button>
+            <button onClick={() => setPriceIndex(i => Math.min(plans.length-1, i+1))} disabled={priceIndex===plans.length-1} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: priceIndex===plans.length-1 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: priceIndex===plans.length-1 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>Next →</button>
           </div>
         </div>
       </div>
@@ -267,13 +299,13 @@ function Home() {
           <div className="testi-mobile">
             <TestiCard t={testimonials[testiIndex]} />
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'1.2rem' }}>
-              <button onClick={() => setTestiIndex(i => Math.max(0, i-1))} disabled={testiIndex === 0} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: testiIndex === 0 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: testiIndex === 0 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>← Prev</button>
+              <button onClick={() => setTestiIndex(i => Math.max(0, i-1))} disabled={testiIndex===0} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: testiIndex===0 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: testiIndex===0 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>← Prev</button>
               <div style={{ display:'flex', gap:'0.4rem' }}>
                 {testimonials.map((_,i) => (
-                  <div key={i} onClick={() => setTestiIndex(i)} style={{ width:8, height:8, borderRadius:'50%', background: i === testiIndex ? '#c8ff00' : 'rgba(240,237,232,0.2)', cursor:'pointer', transition:'all 0.3s' }} />
+                  <div key={i} onClick={() => setTestiIndex(i)} style={{ width:8, height:8, borderRadius:'50%', background: i===testiIndex ? '#c8ff00' : 'rgba(240,237,232,0.2)', cursor:'pointer', transition:'all 0.3s' }} />
                 ))}
               </div>
-              <button onClick={() => setTestiIndex(i => Math.min(testimonials.length-1, i+1))} disabled={testiIndex === testimonials.length-1} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: testiIndex === testimonials.length-1 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: testiIndex === testimonials.length-1 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>Next →</button>
+              <button onClick={() => setTestiIndex(i => Math.min(testimonials.length-1, i+1))} disabled={testiIndex===testimonials.length-1} style={{ background:'rgba(240,237,232,0.08)', border:'none', color: testiIndex===testimonials.length-1 ? 'rgba(240,237,232,0.2)' : '#f0ede8', borderRadius:'100px', padding:'0.6rem 1.4rem', cursor: testiIndex===testimonials.length-1 ? 'default' : 'pointer', fontSize:'0.85rem', fontWeight:600 }}>Next →</button>
             </div>
           </div>
         </div>
@@ -288,7 +320,7 @@ function Home() {
         <p style={{ fontSize:'0.95rem', color:'rgba(240,237,232,0.45)', marginBottom:'2rem' }}>
           Join thousands of internationals who stopped guessing and started getting sponsored.
         </p>
-        <a href="/signup" style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', background:'#c8ff00', color:'#080808', padding:'0.95rem 2.2rem', borderRadius:'100px', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', boxShadow:'0 0 50px rgba(200,255,0,0.25)' }}>
+        <a href="/login" style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', background:'#c8ff00', color:'#080808', padding:'0.95rem 2.2rem', borderRadius:'100px', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', boxShadow:'0 0 50px rgba(200,255,0,0.25)' }}>
           Find my Sponsrr →
         </a>
       </div>
@@ -315,8 +347,9 @@ function Home() {
             <a key={l} href={`/${l.toLowerCase()}`} style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.35)', textDecoration:'none' }}>{l}</a>
           ))}
         </div>
-        <p style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.28)' }}>© 2025 Sponsrr. Built for internationals.</p>
+        <p style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.28)', margin:0 }}>© 2025 Sponsrr. Built for internationals.</p>
       </footer>
+
     </div>
   );
 }
@@ -340,7 +373,7 @@ function PriceCard({ p }) {
           </li>
         ))}
       </ul>
-      <a href="/signup" style={{ display:'block', textAlign:'center', marginTop:'1.3rem', padding:'0.7rem', borderRadius:'100px', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', background: p.best ? '#c8ff00' : 'transparent', color: p.best ? '#080808' : '#f0ede8', border: p.best ? '1px solid #c8ff00' : '1px solid rgba(240,237,232,0.15)' }}>
+      <a href="/login" style={{ display:'block', textAlign:'center', marginTop:'1.3rem', padding:'0.7rem', borderRadius:'100px', fontWeight:600, fontSize:'0.82rem', textDecoration:'none', background: p.best ? '#c8ff00' : 'transparent', color: p.best ? '#080808' : '#f0ede8', border: p.best ? '1px solid #c8ff00' : '1px solid rgba(240,237,232,0.15)' }}>
         Start {p.period.toLowerCase()}
       </a>
     </div>
