@@ -6,6 +6,8 @@ import Companies from './pages/Companies';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Pricing from './pages/Pricing';
+import Success from './pages/Success';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/signup" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/jobs/:slug" element={<JobDetail />} />
+        <Route path="/pricing" element={<Pricing />} />
+<Route path="/success" element={<Success />} />
       </Routes>
     </Router>
   );
