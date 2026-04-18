@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Jobs from './pages/Jobs';
+import JobDetail from './pages/JobDetail';
 import Companies from './pages/Companies';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/jobs/:slug" element={<JobDetail />} />
       </Routes>
     </Router>
   );
