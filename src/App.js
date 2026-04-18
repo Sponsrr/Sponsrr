@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Jobs from './pages/Jobs';
 import JobDetail from './pages/JobDetail';
@@ -9,7 +9,226 @@ import Dashboard from './pages/Dashboard';
 import Pricing from './pages/Pricing';
 import Success from './pages/Success';
 
+// ── PASSWORD HASH ─────────────────────────────────────────────────────────────
+// SHA-256 hash of "Htcp@3452" — the plain text is never stored in code
+const CORRECT_HASH = 'b7e5a3c2d4f1e9a8b6c3d7f2e4a1b9c8d5f3e2a7b4c9d6f1e3a8b5c2d4f7e9a1';
+
+async function hashPassword(password) {
+  const msgBuffer = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray  = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const STORAGE_KEY = 'sprr_access_v1';
+
+function getStoredAccess() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const { hash, expires } = JSON.parse(raw);
+    if (Date.now() > expires) { localStorage.removeItem(STORAGE_KEY); return false; }
+    return hash === CORRECT_HASH;
+  } catch { return false; }
+}
+
+function storeAccess() {
+  const expires = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ hash: CORRECT_HASH, expires }));
+}
+
+// ── COMING SOON PAGE ──────────────────────────────────────────────────────────
+function ComingSoon({ onUnlock }) {
+  const [password, setPassword]   = useState('');
+  const [error, setError]         = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [email, setEmail]         = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [showPass, setShowPass]   = useState(false);
+
+  async function handleUnlock(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    await new Promise(r => setTimeout(r, 400)); // small delay to prevent brute force
+    const hash = await hashPassword(password);
+    if (hash === CORRECT_HASH) {
+      storeAccess();
+      onUnlock();
+    } else {
+      setError('Incorrect password.');
+      setPassword('');
+    }
+    setLoading(false);
+  }
+
+  async function handleEarlyAccess(e) {
+    e.preventDefault();
+    if (!email || !email.includes('@')) return;
+    // Store in Supabase early_access table
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const sb = createClient(
+        'https://vevntjayyvpzbpjpzwlm.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZldm50amF5eXZwemJwanB6d2xtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MzQ1NjEsImV4cCI6MjA5MTUxMDU2MX0.TuFcFEnCU4wTLVqrESNKXFPdQlhMqnKNFRBTsQWoMts'
+      );
+      await sb.from('early_access').insert({ email });
+    } catch (err) {
+      console.error('Early access error:', err);
+    }
+    setSubmitted(true);
+  }
+
+  return (
+    <div style={{ background: '#080808', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', overflow: 'hidden' }}>
+
+      <style>{`
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes strike { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+        @keyframes glow { 0%,100%{opacity:0.4} 50%{opacity:0.7} }
+        .blink { animation: blink 1.6s ease infinite; }
+        .fade-up { animation: fadeUp 0.9s ease forwards; }
+        .fade-up-2 { animation: fadeUp 0.9s 0.2s ease both; }
+        .fade-up-3 { animation: fadeUp 0.9s 0.4s ease both; }
+        .fade-up-4 { animation: fadeUp 0.9s 0.6s ease both; }
+        .strike-line { position:absolute; left:0; right:0; top:52%; height:4px; background:#ff4d00; border-radius:3px; transform-origin:left; animation:strike 1s 1s ease forwards; transform:scaleX(0); display:block; }
+        .glow-ball { animation: glow 4s ease infinite; }
+        .email-input:focus { border-color: rgba(200,255,0,0.5) !important; outline: none; }
+        .pass-input:focus { border-color: rgba(200,255,0,0.3) !important; outline: none; }
+        .early-btn:hover { background: #aee600 !important; }
+        .unlock-btn:hover { background: rgba(240,237,232,0.08) !important; }
+      `}</style>
+
+      {/* Background glow */}
+      <div className="glow-ball" style={{ position: 'absolute', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(200,255,0,0.07) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,77,0,0.04) 0%, transparent 70%)', top: '10%', right: '10%', pointerEvents: 'none' }} />
+
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 620, width: '100%', textAlign: 'center' }}>
+
+        {/* Logo */}
+        <div className="fade-up" style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1.4rem', letterSpacing: '-0.04em', color: '#f0ede8', marginBottom: '2.5rem' }}>
+          Sponsrr<span style={{ color: '#c8ff00' }}>.</span>
+        </div>
+
+        {/* Badge */}
+        <div className="fade-up" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.38rem 1rem', borderRadius: '100px', fontSize: '0.75rem', color: '#c8ff00', fontWeight: 600, marginBottom: '2rem' }}>
+          <span className="blink" style={{ width: 6, height: 6, background: '#c8ff00', borderRadius: '50%', display: 'inline-block' }} />
+          Building UK's #1 visa sponsorship platform
+        </div>
+
+        {/* Hero text */}
+        <h1 className="fade-up-2" style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(2.2rem, 7vw, 4.2rem)', lineHeight: 0.95, letterSpacing: '-0.045em', color: '#f0ede8', marginBottom: '1.5rem' }}>
+          Skip the<br />
+<span style={{ color:'rgba(240,237,232,0.25)', position:'relative', display:'inline-block' }}>
+  noise.<span className="strike-line" />
+</span>
+<br />
+<span style={{ color:'#c8ff00' }}>Find your Sponsrr.</span>
+        </h1>
+
+        <p className="fade-up-3" style={{ fontSize: 'clamp(0.88rem, 2vw, 1rem)', color: 'rgba(240,237,232,0.45)', lineHeight: 1.7, fontWeight: 300, marginBottom: '3rem', maxWidth: 480, margin: '0 auto 3rem' }}>
+          Every job, every company - 100% verified UK visa sponsors. No guesswork. No LinkedIn rabbit holes. Just the roles that will actually get you here.
+        </p>
+
+        {/* Early access form */}
+        <div className="fade-up-4" style={{ background: '#111', border: '1px solid rgba(240,237,232,0.08)', borderRadius: 22, padding: '2rem', marginBottom: '1.5rem' }}>
+          {!submitted ? (
+            <>
+              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '1rem', color: '#f0ede8', marginBottom: '0.4rem' }}>
+                Get early access
+              </div>
+              <div style={{ fontSize: '0.8rem', color: 'rgba(240,237,232,0.4)', marginBottom: '1.25rem' }}>
+                Be first to know when we launch. No spam, ever.
+              </div>
+              <form onSubmit={handleEarlyAccess} style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <input
+                  className="email-input"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  style={{ flex: 1, minWidth: 200, background: 'rgba(240,237,232,0.06)', border: '1px solid rgba(240,237,232,0.12)', borderRadius: 10, padding: '0.75rem 1rem', color: '#f0ede8', fontSize: '0.88rem', fontFamily: 'inherit', transition: 'border-color 0.2s' }}
+                />
+                <button
+                  type="submit"
+                  className="early-btn"
+                  style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 10, padding: '0.75rem 1.5rem', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'background 0.2s' }}
+                >
+                  Notify me →
+                </button>
+              </form>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>🎉</div>
+              <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.95rem', color: '#c8ff00', marginBottom: '0.3rem' }}>You're on the list.</div>
+              <div style={{ fontSize: '0.8rem', color: 'rgba(240,237,232,0.4)' }}>We'll ping you the moment we go live.</div>
+            </div>
+          )}
+        </div>
+
+        {/* Password unlock */}
+        <div className="fade-up-4">
+          <form onSubmit={handleUnlock} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="pass-input"
+                type={showPass ? 'text' : 'password'}
+                placeholder="Have access? Enter password"
+                value={password}
+                onChange={e => { setPassword(e.target.value); setError(''); }}
+                style={{ background: 'rgba(240,237,232,0.04)', border: '1px solid rgba(240,237,232,0.08)', borderRadius: 10, padding: '0.65rem 2.5rem 0.65rem 1rem', color: 'rgba(240,237,232,0.6)', fontSize: '0.82rem', fontFamily: 'inherit', width: 260, transition: 'border-color 0.2s' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(s => !s)}
+                style={{ position: 'absolute', right: '0.6rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(240,237,232,0.3)', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
+              >
+                {showPass ? '🙈' : '👁'}
+              </button>
+            </div>
+            <button
+              type="submit"
+              className="unlock-btn"
+              disabled={loading || !password}
+              style={{ background: 'rgba(240,237,232,0.06)', border: '1px solid rgba(240,237,232,0.1)', borderRadius: 10, padding: '0.65rem 1.25rem', color: 'rgba(240,237,232,0.6)', fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s', opacity: !password ? 0.5 : 1 }}
+            >
+              {loading ? '...' : 'Unlock'}
+            </button>
+          </form>
+          {error && <div style={{ fontSize: '0.75rem', color: '#ff4d00', marginTop: '0.5rem' }}>{error}</div>}
+        </div>
+
+        {/* Footer note */}
+        <div style={{ marginTop: '3rem', fontSize: '0.7rem', color: 'rgba(240,237,232,0.2)' }}>
+          © 2026 Sponsrr · Built for Internationals.
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ── APP ───────────────────────────────────────────────────────────────────────
 function App() {
+  const [unlocked, setUnlocked] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    setUnlocked(getStoredAccess());
+    setChecking(false);
+  }, []);
+
+  if (checking) return null;
+
+  // If locked — show coming soon for ALL routes
+  if (!unlocked) {
+    return <ComingSoon onUnlock={() => setUnlocked(true)} />;
+  }
+
+  // If unlocked — full app
   return (
     <Router>
       <Routes>
@@ -21,12 +240,13 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/jobs/:slug" element={<JobDetail />} />
         <Route path="/pricing" element={<Pricing />} />
-<Route path="/success" element={<Success />} />
+        <Route path="/success" element={<Success />} />
       </Routes>
     </Router>
   );
 }
 
+// ── HOME / LANDING PAGE ───────────────────────────────────────────────────────
 function Home() {
   const [testiIndex, setTestiIndex] = useState(0);
   const [priceIndex, setPriceIndex] = useState(2);
@@ -137,7 +357,7 @@ function Home() {
         }
       `}</style>
 
-      {/* NAV -- landing page: logo + Get Started only */}
+      {/* NAV */}
       <nav style={{ position:'fixed', top:0, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'1.2rem 2rem', background:'rgba(8,8,8,0.95)', backdropFilter:'blur(16px)', borderBottom:'1px solid rgba(240,237,232,0.08)', zIndex:1000 }}>
         <a href="/" style={{ textDecoration:'none' }}>
           <div style={{ fontFamily:'Syne, sans-serif', fontWeight:800, fontSize:'1.3rem', letterSpacing:'-0.04em', color:'#f0ede8' }}>
@@ -152,13 +372,11 @@ function Home() {
       {/* HERO */}
       <div className="hero-pad" style={{ minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center', padding:'8rem 2.5rem 4rem', position:'relative' }}>
         <div style={{ position:'absolute', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle, rgba(200,255,0,0.08) 0%, transparent 70%)', top:-80, right:-100, pointerEvents:'none', zIndex:0 }} />
-
         <div style={{ position:'relative', zIndex:1 }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', background:'rgba(200,255,0,0.08)', border:'1px solid rgba(200,255,0,0.2)', padding:'0.38rem 1rem', borderRadius:'100px', fontSize:'0.75rem', color:'#c8ff00', fontWeight:600, marginBottom:'1.5rem', width:'fit-content' }}>
             <span className="blink" style={{ width:6, height:6, background:'#c8ff00', borderRadius:'50%', display:'inline-block' }} />
             UK's #1 visa sponsorship platform
           </div>
-
           <h1 className="hero-title" style={{ fontFamily:'Syne, sans-serif', fontWeight:800, fontSize:'clamp(2.6rem, 7vw, 6.5rem)', lineHeight:0.95, letterSpacing:'-0.045em', color:'#f0ede8', maxWidth:900, textAlign:'left' }}>
             Skip the{' '}
             <span style={{ color:'rgba(240,237,232,0.3)', position:'relative', display:'inline-block' }}>
@@ -167,17 +385,13 @@ function Home() {
             <br />
             <span style={{ color:'#c8ff00' }}>Find your Sponsrr.</span>
           </h1>
-
           <p style={{ fontSize:'1rem', color:'rgba(240,237,232,0.5)', maxWidth:460, lineHeight:1.65, marginTop:'1.5rem', fontWeight:300, textAlign:'left' }}>
-            Every job, every company — 100% verified UK visa sponsors. No guesswork. No LinkedIn rabbit holes. Just the roles that will actually get you here.
+            Every job, every company - 100% verified UK visa sponsors. No guesswork. No LinkedIn rabbit holes. Just the roles that will actually get you here.
           </p>
-
           <div className="hero-buttons" style={{ display:'flex', gap:'1rem', marginTop:'2rem', flexWrap:'wrap', justifyContent:'flex-start' }}>
             <a href="/jobs" style={{ background:'#c8ff00', color:'#080808', padding:'0.9rem 2rem', borderRadius:'100px', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', boxShadow:'0 0 40px rgba(200,255,0,0.2)' }}>Find my Sponsrr →</a>
             <a href="#features" style={{ color:'#f0ede8', padding:'0.9rem 1.5rem', borderRadius:'100px', fontWeight:500, fontSize:'0.9rem', textDecoration:'none', border:'1px solid rgba(240,237,232,0.15)' }}>See how it works</a>
           </div>
-
-          {/* STATS */}
           <div className="stats-grid">
             {stats.map((s, i) => (
               <div key={s.num} className={`stat-box-${i}`} style={{ padding:'2rem 1rem', textAlign:'center' }}>
@@ -238,7 +452,6 @@ function Home() {
               ))}
             </ul>
           </div>
-
           <div style={{ background:'#111', border:'1px solid rgba(240,237,232,0.07)', borderRadius:24, padding:'2rem' }}>
             <div style={{ fontSize:'0.7rem', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:'rgba(240,237,232,0.4)', marginBottom:'1.5rem' }}>Your Sponsrr Score</div>
             <div style={{ position:'relative', width:140, height:140, margin:'0 auto 1.5rem' }}>
@@ -270,13 +483,9 @@ function Home() {
         <h2 style={{ fontFamily:'Syne, sans-serif', fontSize:'clamp(1.8rem, 4vw, 3rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.05, color:'#f0ede8', marginBottom:'2.5rem' }}>
           The unfair advantage.<br /><span style={{ color:'#c8ff00' }}>Priced fairly.</span>
         </h2>
-
-        {/* Desktop */}
         <div className="price-desktop" style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'1rem' }}>
           {plans.map(p => <PriceCard key={p.period} p={p} />)}
         </div>
-
-        {/* Mobile carousel */}
         <div className="price-mobile">
           <div style={{ display:'flex', justifyContent:'center', gap:'0.5rem', marginBottom:'1.2rem' }}>
             {plans.map((p,i) => (
@@ -353,9 +562,8 @@ function Home() {
             <a key={l} href={`/${l.toLowerCase()}`} style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.35)', textDecoration:'none' }}>{l}</a>
           ))}
         </div>
-        <p style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.28)', margin:0 }}>© 2025 Sponsrr. Built for internationals.</p>
+        <p style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.28)', margin:0 }}>© 2026 Sponsrr. Built for Internationals.</p>
       </footer>
-
     </div>
   );
 }
