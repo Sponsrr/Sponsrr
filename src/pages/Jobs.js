@@ -49,6 +49,12 @@ const SECTOR_KEYWORDS = {
   'Security':                    ['security','guard','surveillance','protection','vetting'],
 };
 
+// Plan hierarchy helpers
+const PLAN_LEVELS = { free: 0, weekly: 1, monthly: 2, quarterly: 3, annual: 4 };
+function planAtLeast(userPlan, required) {
+  return (PLAN_LEVELS[userPlan] || 0) >= (PLAN_LEVELS[required] || 0);
+}
+
 function formatSalary(min, max) {
   if (!min && !max) return null;
   const fmt = n => `£${Number(n).toLocaleString('en-GB')}`;
@@ -156,39 +162,22 @@ function UpgradeModal({ onClose, onUpgrade }) {
             Full search, filters, sorting and thousands of verified UK sponsorship jobs. Less than a meal deal a month.
           </p>
         </div>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.25rem' }}>
           {[
-            { plan: 'Monthly',   price: '£3.49', period: '/month',      tag: 'Most flexible',  saving: '12%',    perWeek: '87p/week',  highlight: false },
-            { plan: 'Quarterly', price: '£9.99', period: '/quarter', tag: 'Most popular ⭐', saving: '24%',   perWeek: '77p/week',  highlight: true  },
-            { plan: 'Annual',    price: '£34.99',period: '/year',    tag: 'Best value',      saving: '32%',   perWeek: '67p/week',  highlight: false },
+            { plan: 'Monthly',   price: '£3.49',  period: '/month',   tag: 'Most flexible',  saving: '12%', perWeek: '87p/week', highlight: false },
+            { plan: 'Quarterly', price: '£9.99',  period: '/quarter', tag: 'Most popular ⭐', saving: '24%', perWeek: '77p/week', highlight: true  },
+            { plan: 'Annual',    price: '£34.99', period: '/year',    tag: 'Best value',      saving: '32%', perWeek: '67p/week', highlight: false },
           ].map(p => (
-            <button
-              key={p.plan}
-              onClick={onUpgrade}
-              style={{
-                background: p.highlight ? '#c8ff00' : 'rgba(240,237,232,0.05)',
-                border: p.highlight ? '2px solid #c8ff00' : '1px solid rgba(240,237,232,0.12)',
-                borderRadius: 14, padding: '0.9rem 1.25rem',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
-              }}
-            >
+            <button key={p.plan} onClick={onUpgrade} style={{ background: p.highlight ? '#c8ff00' : 'rgba(240,237,232,0.05)', border: p.highlight ? '2px solid #c8ff00' : '1px solid rgba(240,237,232,0.12)', borderRadius: 14, padding: '0.9rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
               <div style={{ textAlign: 'left' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.92rem', color: p.highlight ? '#080808' : '#f0ede8' }}>{p.plan}</span>
-                  {p.saving && (
-                    <span style={{ background: p.highlight ? 'rgba(8,8,8,0.15)' : 'rgba(200,255,0,0.12)', color: p.highlight ? '#080808' : '#c8ff00', fontSize: '0.6rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '100px' }}>Save {p.saving}</span>
-                  )}
+                  {p.saving && <span style={{ background: p.highlight ? 'rgba(8,8,8,0.15)' : 'rgba(200,255,0,0.12)', color: p.highlight ? '#080808' : '#c8ff00', fontSize: '0.6rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '100px' }}>Save {p.saving}</span>}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: p.highlight ? 'rgba(8,8,8,0.55)' : 'rgba(240,237,232,0.35)', marginTop: '0.15rem' }}>
-                  {p.tag} · {p.perWeek}
-                </div>
+                <div style={{ fontSize: '0.7rem', color: p.highlight ? 'rgba(8,8,8,0.55)' : 'rgba(240,237,232,0.35)', marginTop: '0.15rem' }}>{p.tag} · {p.perWeek}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1.1rem', color: p.highlight ? '#080808' : '#c8ff00' }}>
-                  {p.price}
-                </div>
+                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1.1rem', color: p.highlight ? '#080808' : '#c8ff00' }}>{p.price}</div>
                 <div style={{ fontSize: '0.65rem', color: p.highlight ? 'rgba(8,8,8,0.5)' : 'rgba(240,237,232,0.3)' }}>{p.period}</div>
               </div>
             </button>
@@ -204,6 +193,7 @@ function UpgradeModal({ onClose, onUpgrade }) {
 export default function Jobs() {
   const navigate = useNavigate();
 
+  const [userPlan, setUserPlan]       = useState('free');
   const [isPaid, setIsPaid]           = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [jobs, setJobs]               = useState([]);
@@ -221,29 +211,36 @@ export default function Jobs() {
   const [salaryMax, setSalaryMax]     = useState('');
   const [page, setPage]               = useState(1);
 
-  const [showModal, setShowModal]         = useState(false);
-  const [shakeTarget, setShakeTarget]     = useState(null);
-  const [sidebarOpen, setSidebarOpen]     = useState(false);
+  const [showModal, setShowModal]           = useState(false);
+  const [shakeTarget, setShakeTarget]       = useState(null);
+  const [sidebarOpen, setSidebarOpen]       = useState(false);
   const [sectorDropOpen, setSectorDropOpen] = useState(false);
   const sectorDropRef = useRef(null);
 
   const FREE_LIMIT = 20;
   const PER_PAGE   = 20;
 
+  // ── AUTH ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     async function checkAuth() {
       const { data: { user: u } } = await supabase.auth.getUser();
       if (!u) { navigate('/login'); return; }
+
       const { data: sub } = await supabase
-        .from('subscriptions').select('plan,status')
-        .eq('user_id', u.id).in('status', ['active','trialing'])
-        .in('plan', ['monthly','quarterly','annual']).limit(1).single();
-      setIsPaid(!!sub);
+        .from('subscriptions').select('plan, status')
+        .eq('user_id', u.id)
+        .in('status', ['active', 'trialing'])
+        .limit(1).single();
+
+      const plan = sub?.plan || 'free';
+      setUserPlan(plan);
+      setIsPaid(planAtLeast(plan, 'monthly'));
       setAuthLoading(false);
     }
     checkAuth();
   }, [navigate]);
 
+  // ── FETCH JOBS ──────────────────────────────────────────────────────────────
   const fetchJobs = useCallback(async () => {
     if (authLoading) return;
     setLoading(true); setError(null);
@@ -252,7 +249,7 @@ export default function Jobs() {
         .eq('is_active', true).order('posted_at', { ascending: false });
 
       if (isPaid) {
-        if (search.trim()) query = query.or([`title.ilike.%${search.trim()}%`,`description.ilike.%${search.trim()}%`,`company_name.ilike.%${search.trim()}%`].join(','));
+        if (search.trim()) query = query.or([`title.ilike.%${search.trim()}%`, `description.ilike.%${search.trim()}%`, `company_name.ilike.%${search.trim()}%`].join(','));
         if (location.trim()) query = query.ilike('location', `%${location.trim()}%`);
         if (sectors.length > 0) {
           const kws = sectors.flatMap(s => SECTOR_KEYWORDS[s] || []);
@@ -300,7 +297,6 @@ export default function Jobs() {
     </div>
   );
 
-  // Fake page numbers to show free users what they're missing
   const fakePages = [1, 2, 3, 4, '...', Math.ceil(total / PER_PAGE)];
 
   return (
@@ -377,7 +373,7 @@ export default function Jobs() {
 
           {/* PC search */}
           <div className="pc-search-row">
-            <input className={`filter-input search-input${!isPaid ? '' : ''}`} placeholder="Job title, skill or keyword..." value={search} onChange={isPaid ? e => setSearch(e.target.value) : undefined} {...(!isPaid ? { readOnly: true, onClick: () => handleLocked('search'), style: { cursor: 'not-allowed', opacity: 0.45 } } : {})} />
+            <input className="filter-input search-input" placeholder="Job title, skill or keyword..." value={search} onChange={isPaid ? e => setSearch(e.target.value) : undefined} {...(!isPaid ? { readOnly: true, onClick: () => handleLocked('search'), style: { cursor: 'not-allowed', opacity: 0.45 } } : {})} />
             <input className="filter-input location-input" placeholder="Location..." value={location} onChange={isPaid ? e => setLocation(e.target.value) : undefined} {...(!isPaid ? { readOnly: true, onClick: () => handleLocked('location'), style: { cursor: 'not-allowed', opacity: 0.45 } } : {})} />
             <div className="sort-wrap-pc" onClick={!isPaid ? () => handleLocked('sort') : undefined}>
               <select className="filter-select" value={sort} onChange={isPaid ? e => setSort(e.target.value) : undefined} disabled={!isPaid}>
@@ -402,11 +398,7 @@ export default function Jobs() {
                 >{s}</button>
               ))}
             </div>
-            {/* Filters button — always clickable, opens sheet which shows locked state */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              style={{ background: 'rgba(240,237,232,0.07)', color: 'rgba(240,237,232,0.6)', border: '1px solid rgba(240,237,232,0.1)', borderRadius: '10px', padding: '0.5rem 0.9rem', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
-            >
+            <button onClick={() => setSidebarOpen(true)} style={{ background: 'rgba(240,237,232,0.07)', color: 'rgba(240,237,232,0.6)', border: '1px solid rgba(240,237,232,0.1)', borderRadius: '10px', padding: '0.5rem 0.9rem', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
               Filters
             </button>
           </div>
@@ -464,6 +456,14 @@ export default function Jobs() {
                 <button onClick={() => setShowModal(true)} style={{ width: '100%', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', borderRadius: 10, padding: '0.75rem', color: '#c8ff00', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1.5 }}>
                   🔓 Unlock all filters<br /><span style={{ fontSize: '0.68rem', fontWeight: 400, color: 'rgba(200,255,0,0.6)' }}>From £3.49/mo</span>
                 </button>
+              )}
+
+              {/* Plan indicator for paid users */}
+              {isPaid && (
+                <div style={{ background: 'rgba(200,255,0,0.05)', border: '1px solid rgba(200,255,0,0.12)', borderRadius: 10, padding: '0.65rem 0.85rem' }}>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(200,255,0,0.6)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>Your plan</div>
+                  <div style={{ fontSize: '0.82rem', color: '#c8ff00', fontWeight: 700, fontFamily: 'Syne, sans-serif', textTransform: 'capitalize' }}>{userPlan}</div>
+                </div>
               )}
             </aside>
 
@@ -557,14 +557,9 @@ export default function Jobs() {
                     )}
                   </div>
 
-                  {/* PAGINATION — both free and paid */}
+                  {/* PAGINATION */}
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-                    {/* Prev */}
-                    <button
-                      onClick={isPaid ? () => setPage(p => Math.max(1, p - 1)) : () => handleLocked('page')}
-                      disabled={isPaid && page === 1}
-                      style={{ ...pageBtn(false, isPaid && page === 1), opacity: !isPaid ? 0.35 : (page === 1 ? 0.3 : 1), cursor: !isPaid ? 'not-allowed' : (page === 1 ? 'default' : 'pointer') }}
-                    >←</button>
+                    <button onClick={isPaid ? () => setPage(p => Math.max(1, p - 1)) : () => handleLocked('page')} disabled={isPaid && page === 1} style={{ ...pageBtn(false, isPaid && page === 1), opacity: !isPaid ? 0.35 : (page === 1 ? 0.3 : 1), cursor: !isPaid ? 'not-allowed' : (page === 1 ? 'default' : 'pointer') }}>←</button>
 
                     {isPaid
                       ? getPageNumbers(page, totalPages).map((p, i) =>
@@ -579,12 +574,7 @@ export default function Jobs() {
                         )
                     }
 
-                    {/* Next */}
-                    <button
-                      onClick={isPaid ? () => setPage(p => Math.min(totalPages, p + 1)) : () => handleLocked('page')}
-                      disabled={isPaid && page === totalPages}
-                      style={{ ...pageBtn(false, isPaid && page === totalPages), opacity: !isPaid ? 0.35 : (page === totalPages ? 0.3 : 1), cursor: !isPaid ? 'not-allowed' : (page === totalPages ? 'default' : 'pointer') }}
-                    >→</button>
+                    <button onClick={isPaid ? () => setPage(p => Math.min(totalPages, p + 1)) : () => handleLocked('page')} disabled={isPaid && page === totalPages} style={{ ...pageBtn(false, isPaid && page === totalPages), opacity: !isPaid ? 0.35 : (page === totalPages ? 0.3 : 1), cursor: !isPaid ? 'not-allowed' : (page === totalPages ? 'default' : 'pointer') }}>→</button>
                   </div>
 
                   {isPaid && totalPages > 1 && (
@@ -593,7 +583,7 @@ export default function Jobs() {
                     </div>
                   )}
 
-                  {/* FREE USER — upgrade banner AFTER pagination */}
+                  {/* FREE USER upgrade banner */}
                   {!isPaid && jobs.length > 0 && (
                     <div className="upgrade-banner">
                       <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>🚀</div>
@@ -625,7 +615,7 @@ export default function Jobs() {
           </div>
         </div>
 
-        {/* MOBILE FILTER SHEET — always opens, locked state shown inside */}
+        {/* MOBILE FILTER SHEET */}
         {sidebarOpen && (
           <>
             <div onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 1000 }} />
@@ -635,7 +625,6 @@ export default function Jobs() {
                 <button onClick={() => setSidebarOpen(false)} style={{ background: 'none', border: 'none', color: 'rgba(240,237,232,0.4)', fontSize: '1.1rem', cursor: 'pointer' }}>✕</button>
               </div>
 
-              {/* Lock notice for free users */}
               {!isPaid && (
                 <div style={{ background: 'rgba(200,255,0,0.06)', border: '1px solid rgba(200,255,0,0.15)', borderRadius: 12, padding: '0.75rem 1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.78rem', color: 'rgba(200,255,0,0.8)' }}>🔒 Filters require Monthly plan</span>
@@ -646,20 +635,14 @@ export default function Jobs() {
               <span className="sidebar-label">Work type {!isPaid && <span style={{ color: '#c8ff00', fontSize: '0.55rem' }}>· Monthly</span>}</span>
               <div style={{ display: 'flex', gap: '0.45rem', marginBottom: '1.4rem', flexWrap: 'wrap' }}>
                 {WORK_TYPES.map(w => (
-                  <button key={w}
-                    onClick={isPaid ? () => setWorkTypes(prev => prev.includes(w) ? prev.filter(x => x !== w) : [...prev, w]) : () => { setSidebarOpen(false); setShowModal(true); }}
-                    style={{ background: workTypes.includes(w) && isPaid ? 'rgba(200,255,0,0.1)' : 'rgba(240,237,232,0.07)', color: workTypes.includes(w) && isPaid ? '#c8ff00' : 'rgba(240,237,232,0.6)', border: workTypes.includes(w) && isPaid ? '1px solid rgba(200,255,0,0.25)' : '1px solid rgba(240,237,232,0.1)', borderRadius: 100, padding: '0.42rem 1rem', fontSize: '0.8rem', fontWeight: workTypes.includes(w) && isPaid ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', opacity: isPaid ? 1 : 0.45 }}
-                  >{w}</button>
+                  <button key={w} onClick={isPaid ? () => setWorkTypes(prev => prev.includes(w) ? prev.filter(x => x !== w) : [...prev, w]) : () => { setSidebarOpen(false); setShowModal(true); }} style={{ background: workTypes.includes(w) && isPaid ? 'rgba(200,255,0,0.1)' : 'rgba(240,237,232,0.07)', color: workTypes.includes(w) && isPaid ? '#c8ff00' : 'rgba(240,237,232,0.6)', border: workTypes.includes(w) && isPaid ? '1px solid rgba(200,255,0,0.25)' : '1px solid rgba(240,237,232,0.1)', borderRadius: 100, padding: '0.42rem 1rem', fontSize: '0.8rem', fontWeight: workTypes.includes(w) && isPaid ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', opacity: isPaid ? 1 : 0.45 }}>{w}</button>
                 ))}
               </div>
 
               <span className="sidebar-label">Sponsor status {!isPaid && <span style={{ color: '#c8ff00', fontSize: '0.55rem' }}>· Monthly</span>}</span>
               <div style={{ display: 'flex', gap: '0.45rem', marginBottom: '1.4rem', flexWrap: 'wrap' }}>
                 {SPONSOR_TIERS.map(t => (
-                  <button key={t.value}
-                    onClick={isPaid ? () => setSponsorTier(t.value) : () => { setSidebarOpen(false); setShowModal(true); }}
-                    style={{ background: sponsorTier === t.value && isPaid ? 'rgba(200,255,0,0.1)' : 'rgba(240,237,232,0.07)', color: sponsorTier === t.value && isPaid ? '#c8ff00' : 'rgba(240,237,232,0.6)', border: sponsorTier === t.value && isPaid ? '1px solid rgba(200,255,0,0.25)' : '1px solid rgba(240,237,232,0.1)', borderRadius: 100, padding: '0.42rem 1rem', fontSize: '0.78rem', fontWeight: sponsorTier === t.value && isPaid ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', opacity: isPaid ? 1 : 0.45 }}
-                  >{t.label}</button>
+                  <button key={t.value} onClick={isPaid ? () => setSponsorTier(t.value) : () => { setSidebarOpen(false); setShowModal(true); }} style={{ background: sponsorTier === t.value && isPaid ? 'rgba(200,255,0,0.1)' : 'rgba(240,237,232,0.07)', color: sponsorTier === t.value && isPaid ? '#c8ff00' : 'rgba(240,237,232,0.6)', border: sponsorTier === t.value && isPaid ? '1px solid rgba(200,255,0,0.25)' : '1px solid rgba(240,237,232,0.1)', borderRadius: 100, padding: '0.42rem 1rem', fontSize: '0.78rem', fontWeight: sponsorTier === t.value && isPaid ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit', opacity: isPaid ? 1 : 0.45 }}>{t.label}</button>
                 ))}
               </div>
 
