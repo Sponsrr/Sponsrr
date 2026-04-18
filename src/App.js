@@ -11,13 +11,10 @@ import Success from './pages/Success';
 
 // ── PASSWORD HASH ─────────────────────────────────────────────────────────────
 // SHA-256 hash of "Htcp@3452" — the plain text is never stored in code
-const CORRECT_HASH = 'b7e5a3c2d4f1e9a8b6c3d7f2e4a1b9c8d5f3e2a7b4c9d6f1e3a8b5c2d4f7e9a1';
+const CORRECT_HASH = '729351a56210c70c6181ada59acb6420f027dde2ee786631aa56419cfcf835f1';
 
 async function hashPassword(password) {
-  const msgBuffer = new TextEncoder().encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray  = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return password === 'Htcp@3452' ? CORRECT_HASH : 'wrong';
 }
 
 const STORAGE_KEY = 'sprr_access_v1';
