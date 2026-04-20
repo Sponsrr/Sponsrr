@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { classifySector } from './classifySector.ts';
 
 const ADZUNA_APP_ID  = '8204bb0d';
 const ADZUNA_APP_KEY = '25ddabb84c2bd761074f9d6133317038';
@@ -8,10 +9,8 @@ const SUPABASE_KEY   = Deno.env.get('SB_SERVICE_KEY')!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Minimum salary threshold — Skilled Worker going rate floor
 const SALARY_THRESHOLD = 41700;
 
-// Search term batches — rotated hourly so we cover everything across the day
 const TERM_BATCHES: Record<number, string[]> = {
   0:  ['software engineer', 'data engineer', 'devops engineer'],
   1:  ['nurse', 'staff nurse', 'registered nurse'],
@@ -39,8 +38,6 @@ const TERM_BATCHES: Record<number, string[]> = {
   23: ['construction manager', 'site manager', 'project engineer'],
 };
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-
 function generateSlug(title: string, company: string, location: string, id: string): string {
   const base = `${title}-${company}-${location}`
     .toLowerCase()
@@ -52,7 +49,6 @@ function generateSlug(title: string, company: string, location: string, id: stri
 }
 
 function meetsThreshold(salaryMin: number | null, salaryMax: number | null): boolean {
-  // If no salary info at all, let it through as "possible" — we can't verify
   if (!salaryMin && !salaryMax) return true;
   const salary = salaryMin || salaryMax || 0;
   return salary >= SALARY_THRESHOLD;
@@ -76,7 +72,6 @@ async function syncAdzuna(terms: string[]): Promise<number> {
 
   for (const term of terms) {
     try {
-      // Pull 2 pages per term = 100 jobs per term
       for (let page = 1; page <= 2; page++) {
         const url = `https://api.adzuna.com/v1/api/jobs/gb/search/${page}?app_id=${ADZUNA_APP_ID}&app_key=${ADZUNA_APP_KEY}&results_per_page=50&what=${encodeURIComponent(term)}&content-type=application/json`;
 
@@ -93,17 +88,17 @@ async function syncAdzuna(terms: string[]): Promise<number> {
           const salaryMin = job.salary_min ? Math.round(job.salary_min) : null;
           const salaryMax = job.salary_max ? Math.round(job.salary_max) : null;
 
-          // Skip jobs clearly below threshold
           if (!meetsThreshold(salaryMin, salaryMax)) continue;
 
           const match = await matchCompany(companyName);
           const externalId = `adzuna_${job.id?.toString() || ''}`;
-          const slug = generateSlug(job.title || '', companyName, job.location?.display_name || '', externalId);
+          const title = job.title || '';
+          const slug = generateSlug(title, companyName, job.location?.display_name || '', externalId);
 
           await supabase.from('jobs').upsert({
             external_id:      externalId,
             slug,
-            title:            job.title,
+            title,
             company_name:     companyName,
             company_id:       match?.id || null,
             location:         job.location?.display_name || '',
@@ -115,6 +110,7 @@ async function syncAdzuna(terms: string[]): Promise<number> {
             sponsorship_tier: match ? 'confirmed' : 'possible',
             is_active:        true,
             posted_at:        job.created ? new Date(job.created).toISOString() : new Date().toISOString(),
+            sector:           classifySector(title),
           }, { onConflict: 'external_id' });
 
           inserted++;
@@ -135,7 +131,6 @@ async function syncReed(terms: string[]): Promise<number> {
 
   for (const term of terms) {
     try {
-      // Reed returns up to 100 results per call, paginate with resultsToSkip
       for (let skip = 0; skip <= 100; skip += 100) {
         const url = `https://www.reed.co.uk/api/1.0/search?keywords=${encodeURIComponent(term)}&locationName=United Kingdom&minimumSalary=${SALARY_THRESHOLD}&resultsToTake=100&resultsToSkip=${skip}`;
 
@@ -161,12 +156,13 @@ async function syncReed(terms: string[]): Promise<number> {
 
           const match = await matchCompany(companyName);
           const externalId = `reed_${job.jobId?.toString() || ''}`;
-          const slug = generateSlug(job.jobTitle || '', companyName, job.locationName || '', externalId);
+          const title = job.jobTitle || '';
+          const slug = generateSlug(title, companyName, job.locationName || '', externalId);
 
           await supabase.from('jobs').upsert({
             external_id:      externalId,
             slug,
-            title:            job.jobTitle,
+            title,
             company_name:     companyName,
             company_id:       match?.id || null,
             location:         job.locationName || '',
@@ -178,12 +174,12 @@ async function syncReed(terms: string[]): Promise<number> {
             sponsorship_tier: match ? 'confirmed' : 'possible',
             is_active:        true,
             posted_at:        job.date ? new Date(job.date).toISOString() : new Date().toISOString(),
+            sector:           classifySector(title),
           }, { onConflict: 'external_id' });
 
           inserted++;
         }
 
-        // If we got less than 100 results, no point paginating further
         if (jobs.length < 100) break;
       }
     } catch (e) {
@@ -200,13 +196,8 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
 
-    // Which batch to run — passed in by cron or manually
-    // If not specified, use current hour to auto-select batch
-    const hour = body.batch ?? new Date().getUTCHours();
+    const hour  = body.batch ?? new Date().getUTCHours();
     const terms = TERM_BATCHES[hour % 24] || TERM_BATCHES[0];
-
-    // Alternate sources by hour — even hours = Adzuna, odd hours = Reed
-    // This means each source gets 12 runs per day
     const source = body.source || (hour % 2 === 0 ? 'adzuna' : 'reed');
 
     console.log(`Running ${source} sync for hour ${hour}, terms: ${terms.join(', ')}`);
@@ -217,8 +208,6 @@ Deno.serve(async (req) => {
     } else {
       inserted = await syncAdzuna(terms);
     }
-
-    
 
     return new Response(JSON.stringify({
       success: true,
