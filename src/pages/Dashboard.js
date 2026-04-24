@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import Layout from '../components/Layout';
+import Navbar from '../components/Navbar';
 
 function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -19,19 +18,12 @@ function Dashboard() {
     loadProfile();
   }, []);
 
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    window.location.href = '/';
-  }
-
   if (loading) return (
     <div style={{ background:'#080808', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>
       <div style={{ color:'rgba(240,237,232,0.4)', fontSize:'0.9rem' }}>Loading...</div>
     </div>
   );
 
-  const firstName = profile?.full_name?.split(' ')[0] || 'Account';
-  const initials = profile?.full_name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() || '?';
 
   const features = [
     {
@@ -119,16 +111,10 @@ function Dashboard() {
   return (
     <Layout>
       <div style={{ background:'#080808', minHeight:'100vh' }}>
+        <Navbar />
         <style>{`
           @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
           .dash-blink { animation: blink 1.6s ease infinite; }
-          .dash-nav-link { color: rgba(240,237,232,0.55); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
-          .dash-nav-link:hover { color: #c8ff00; }
-          .dropdown-item { display: block; padding: 0.65rem 1rem; font-size: 0.85rem; color: rgba(240,237,232,0.7); text-decoration: none; transition: all 0.2s; border-radius: 8px; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: inherit; }
-          .dropdown-item:hover { background: rgba(240,237,232,0.06); color: #f0ede8; }
-          .dropdown-item-danger:hover { background: rgba(255,77,0,0.08); color: #ff4d00; }
-          .hamburger-link { display: block; color: rgba(240,237,232,0.7); text-decoration: none; font-size: 1.05rem; font-weight: 600; font-family: 'Syne', sans-serif; padding: 0.6rem 0; border-bottom: 1px solid rgba(240,237,232,0.06); transition: color 0.2s; }
-          .hamburger-link:hover { color: #c8ff00; }
 
           /* ── HOVER STATES ───────────────────────────────────── */
           .cta-plan-btn { transition: background 0.2s, color 0.2s, border 0.2s !important; }
@@ -210,68 +196,10 @@ function Dashboard() {
               --peek:   30px;
             }
           }
-          @media(min-width:769px) {
-            .dash-hamburger { display: none !important; }
-          }
+
         `}</style>
 
-        {/* DASHBOARD NAVBAR */}
-        <nav style={{ position:'fixed', top:0, left:0, right:0, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'1rem 2rem', background:'rgba(8,8,8,0.95)', backdropFilter:'blur(16px)', borderBottom:'1px solid rgba(240,237,232,0.08)', zIndex:1000 }}>
-          <a href="/" style={{ textDecoration:'none' }}>
-            <div style={{ fontFamily:'Syne, sans-serif', fontWeight:800, fontSize:'1.3rem', letterSpacing:'-0.04em', color:'#f0ede8' }}>
-              Sponsrr<span style={{ color:'#c8ff00' }}>.</span>
-            </div>
-          </a>
-
-          <div className="dash-desktop-nav" style={{ display:'flex', alignItems:'center', gap:'1.8rem' }}>
-            <a href="/jobs" className="dash-nav-link">Jobs</a>
-            <a href="/companies" className="dash-nav-link">Companies</a>
-            <a href="/pricing" className="dash-nav-link upgrade-pill" style={{ background:'rgba(200,255,0,0.1)', color:'#c8ff00', padding:'0.4rem 1rem', borderRadius:'100px', fontWeight:600, fontSize:'0.82rem' }}>Upgrade</a>
-            <div style={{ position:'relative' }}>
-              <button onClick={() => setDropdownOpen(!dropdownOpen)} className="avatar-btn" style={{ width:36, height:36, borderRadius:'50%', background:'linear-gradient(135deg, #c8ff00, #ff4d00)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Syne, sans-serif', fontWeight:800, fontSize:'0.75rem', color:'#080808' }}>
-                {initials}
-              </button>
-              {dropdownOpen && (
-                <div style={{ position:'absolute', top:'calc(100% + 0.75rem)', right:0, background:'#1a1a1a', border:'1px solid rgba(240,237,232,0.1)', borderRadius:16, padding:'0.5rem', minWidth:200, zIndex:200, boxShadow:'0 8px 32px rgba(0,0,0,0.4)' }}>
-                  <div style={{ padding:'0.75rem 1rem', borderBottom:'1px solid rgba(240,237,232,0.06)', marginBottom:'0.4rem' }}>
-                    <div style={{ fontFamily:'Syne, sans-serif', fontWeight:700, fontSize:'0.88rem', color:'#f0ede8' }}>{firstName}</div>
-                    <div style={{ fontSize:'0.72rem', color:'rgba(240,237,232,0.35)', marginTop:'0.1rem' }}>Free plan</div>
-                  </div>
-                  <a href="/dashboard" className="dropdown-item">🏠 Dashboard</a>
-                  <a href="/profile" className="dropdown-item">👤 Edit profile</a>
-                  <a href="/preferences" className="dropdown-item">⚙️ Preferences</a>
-                  <a href="/pricing" className="dropdown-item">⚡ Upgrade plan</a>
-                  <div style={{ height:1, background:'rgba(240,237,232,0.06)', margin:'0.4rem 0' }} />
-                  <button onClick={handleSignOut} className="dropdown-item dropdown-item-danger">🚪 Sign out</button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <button className="dash-hamburger" onClick={() => setMenuOpen(!menuOpen)} style={{ background:'none', border:'none', cursor:'pointer', padding:'0.5rem', flexDirection:'column', gap:5, display:'none' }}>
-            {[0,1,2].map(i => (
-              <span key={i} style={{ display:'block', width:22, height:2, background:'#f0ede8', borderRadius:2, transition:'all 0.3s',
-                transform: menuOpen ? (i===0 ? 'rotate(45deg) translate(5px,5px)' : i===2 ? 'rotate(-45deg) translate(5px,-5px)' : 'scaleX(0)') : 'none'
-              }} />
-            ))}
-          </button>
-        </nav>
-
         {/* Mobile menu */}
-        {menuOpen && (
-          <div style={{ position:'fixed', top:61, left:0, right:0, background:'#0f0f0f', borderBottom:'1px solid rgba(240,237,232,0.08)', zIndex:999, padding:'1.5rem', display:'flex', flexDirection:'column', gap:'0.5rem' }}>
-            <div style={{ paddingBottom:'0.75rem', marginBottom:'0.25rem', borderBottom:'1px solid rgba(240,237,232,0.06)' }}>
-              <div style={{ fontFamily:'Syne, sans-serif', fontWeight:700, fontSize:'0.9rem', color:'#f0ede8' }}>{firstName}</div>
-              <div style={{ fontSize:'0.72rem', color:'rgba(240,237,232,0.35)', marginTop:'0.1rem' }}>Free plan</div>
-            </div>
-            <a href="/jobs" className="hamburger-link" onClick={() => setMenuOpen(false)}>Jobs</a>
-            <a href="/companies" className="hamburger-link" onClick={() => setMenuOpen(false)}>Companies</a>
-            <a href="/profile" className="hamburger-link" onClick={() => setMenuOpen(false)}>Edit profile</a>
-            <a href="/preferences" className="hamburger-link" onClick={() => setMenuOpen(false)}>Preferences</a>
-            <a href="/pricing" onClick={() => setMenuOpen(false)} style={{ display:'block', background:'rgba(200,255,0,0.1)', color:'#c8ff00', padding:'0.75rem 1rem', borderRadius:12, fontWeight:700, fontSize:'0.9rem', textDecoration:'none', textAlign:'center', marginTop:'0.5rem' }}>⚡ Upgrade plan</a>
-            <button onClick={handleSignOut} style={{ background:'rgba(255,77,0,0.08)', color:'#ff4d00', border:'1px solid rgba(255,77,0,0.15)', borderRadius:12, padding:'0.75rem', fontWeight:600, fontSize:'0.9rem', cursor:'pointer', fontFamily:'inherit', marginTop:'0.25rem' }}>Sign out</button>
-          </div>
-        )}
 
         <div style={{ maxWidth:1100, margin:'0 auto', padding:'6rem 2rem 4rem' }}>
 

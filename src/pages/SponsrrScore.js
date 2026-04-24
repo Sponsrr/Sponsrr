@@ -3,36 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Layout from '../components/Layout';
 import { supabase } from '../supabase';
+import { SOC_DATABASE } from './socData';
 
-// ── SOC CODE GOING RATES (subset of key roles) ────────────────────────────────
-const SOC_GOING_RATES = {
-  '2134': { title: 'Programmers and Software Development Professionals', rate: 52000, newEntrantRate: 36400 },
-  '2133': { title: 'IT Business Analysts, Architects and Systems Designers', rate: 55000, newEntrantRate: 38500 },
-  '2135': { title: 'Cyber Security Professionals', rate: 55000, newEntrantRate: 38500 },
-  '2136': { title: 'IT Quality and Testing Professionals', rate: 48000, newEntrantRate: 33600 },
-  '2137': { title: 'IT Network Professionals', rate: 50000, newEntrantRate: 35000 },
-  '2132': { title: 'IT Managers', rate: 58000, newEntrantRate: 40600 },
-  '2131': { title: 'IT Project Managers', rate: 55000, newEntrantRate: 38500 },
-  '2211': { title: 'Generalist Medical Practitioners', rate: 62000, newEntrantRate: 43400 },
-  '2212': { title: 'Specialist Medical Practitioners', rate: 78000, newEntrantRate: 54600 },
-  '2232': { title: 'Registered Community Nurses', rate: 35000, newEntrantRate: 24500 },
-  '2233': { title: 'Registered Specialist Nurses', rate: 37000, newEntrantRate: 25900 },
-  '2251': { title: 'Pharmacists', rate: 45000, newEntrantRate: 31500 },
-  '2421': { title: 'Chartered and Certified Accountants', rate: 50000, newEntrantRate: 35000 },
-  '2422': { title: 'Finance and Investment Analysts', rate: 52000, newEntrantRate: 36400 },
-  '2313': { title: 'Secondary Education Teaching Professionals', rate: 38000, newEntrantRate: 26600 },
-  '2311': { title: 'Higher Education Teaching Professionals', rate: 45000, newEntrantRate: 31500 },
-  '2121': { title: 'Civil Engineers', rate: 48000, newEntrantRate: 33600 },
-  '2122': { title: 'Mechanical Engineers', rate: 48000, newEntrantRate: 33600 },
-  '2123': { title: 'Electrical Engineers', rate: 48000, newEntrantRate: 33600 },
-  '2412': { title: 'Solicitors and Lawyers', rate: 58000, newEntrantRate: 40600 },
-  '2431': { title: 'Management Consultants and Business Analysts', rate: 52000, newEntrantRate: 36400 },
-  '2461': { title: 'Social Workers', rate: 38000, newEntrantRate: 26600 },
-  '3544': { title: 'Data Analysts', rate: 43000, newEntrantRate: 30100 },
-  '2141': { title: 'Web Design Professionals', rate: 45000, newEntrantRate: 31500 },
-  '2451': { title: 'Architects', rate: 48000, newEntrantRate: 33600 },
-  '2453': { title: 'Quantity Surveyors', rate: 48000, newEntrantRate: 33600 },
-};
+// ── SOC GOING RATES — built from verified GOV.UK data in socData.js ───────────
+// Single source of truth — 261 codes with real going rates, no more estimates
+const SOC_GOING_RATES = Object.fromEntries(
+  SOC_DATABASE
+    .filter(s => s.rate !== null)
+    .map(s => [s.code, { title: s.title, rate: s.rate, newEntrantRate: s.lowerRate }])
+);
 
 // ── SECTOR SPONSOR DENSITY (approximate counts from our 121k database) ────────
 const SECTOR_DENSITY = {
@@ -624,6 +603,9 @@ export default function SponsrrScore() {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied]     = useState(false);
 
+  // Scroll to top immediately so loader is centred on screen
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
+
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -740,9 +722,7 @@ export default function SponsrrScore() {
               <button onClick={handleShare} className="share-btn" style={{ background: '#0A66C2', color: '#fff', border: 'none', borderRadius: '100px', padding: '0.65rem 1.4rem', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '0.4rem', transition: 'transform 0.2s' }}>
                 <span>in</span> Share on LinkedIn
               </button>
-              <button onClick={handleCopyScore} className="share-btn" style={{ background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', color: '#c8ff00', borderRadius: '100px', padding: '0.65rem 1.4rem', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', transition: 'transform 0.2  s' }}>
-                {copied ? '✓ Copied' : 'Copy score'}
-              </button>
+
             </div>
           </div>
 
@@ -799,10 +779,16 @@ export default function SponsrrScore() {
 
           {/* Actions */}
           <div className="fade-up-5" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
-            <button onClick={() => navigate('/jobs')} style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 14, padding: '1rem', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', textAlign: 'center' }}>
+            <button onClick={() => navigate('/jobs')}
+              onMouseEnter={e => { e.currentTarget.style.background='#aee600'; e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(200,255,0,0.25)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background='#c8ff00'; e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='none'; }}
+              style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 14, padding: '1rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease' }}>
               Matching jobs →
             </button>
-            <button onClick={() => navigate('/dashboard')} style={{ background: 'rgba(240,237,232,0.05)', color: '#f0ede8', border: '1px solid rgba(240,237,232,0.1)', borderRadius: 14, padding: '1rem', fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer', textAlign: 'center' }}>
+            <button onClick={() => navigate('/dashboard')}
+              onMouseEnter={e => { e.currentTarget.style.background='rgba(240,237,232,0.08)'; e.currentTarget.style.borderColor='rgba(240,237,232,0.7)'; e.currentTarget.style.transform='translateY(-2px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background='rgba(240,237,232,0.05)'; e.currentTarget.style.borderColor='rgba(240,237,232,0.1)'; e.currentTarget.style.transform='translateY(0)'; }}
+              style={{ background: 'rgba(240,237,232,0.05)', color: '#f0ede8', border: '1px solid rgba(240,237,232,0.1)', borderRadius: 14, padding: '1rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease' }}>
               Edit profile
             </button>
           </div>
