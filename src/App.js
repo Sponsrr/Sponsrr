@@ -10,6 +10,8 @@ import Pricing from './pages/Pricing';
 import Success from './pages/Success';
 import SponsrrScore from './pages/SponsrrScore';
 import SalaryChecker from './pages/SalaryChecker';
+import EditProfile from './pages/EditProfile';
+import Welcome from './pages/Welcome';
 
 // ── PASSWORD HASH ─────────────────────────────────────────────────────────────
 // SHA-256 hash of "Htcp@3452" — the plain text is never stored in code
@@ -242,6 +244,8 @@ function App() {
         <Route path="/success" element={<Success />} />
         <Route path="/score" element={<SponsrrScore />} />
         <Route path="/salary" element={<SalaryChecker />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/welcome" element={<Welcome />} />
       </Routes>
     </Router>
   );
