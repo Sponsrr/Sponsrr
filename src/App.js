@@ -12,6 +12,11 @@ import SponsrrScore from './pages/SponsrrScore';
 import SalaryChecker from './pages/SalaryChecker';
 import EditProfile from './pages/EditProfile';
 import Welcome from './pages/Welcome';
+import Onboarding from './pages/Onboarding';
+import Calculator from './pages/Calculator';
+import CVBuilder from './pages/CVBuilder';
+import CoverLetter from './pages/CoverLetter';
+import CVLanding from './pages/CVLanding';
 
 // ── PASSWORD HASH ─────────────────────────────────────────────────────────────
 // SHA-256 hash of "Htcp@3452" — the plain text is never stored in code
@@ -246,6 +251,11 @@ function App() {
         <Route path="/salary" element={<SalaryChecker />} />
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/welcome" element={<Welcome />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/calculator" element={<Calculator />} />
+        <Route path="/cv-builder" element={<CVBuilder />} />
+        <Route path="/cover-letter" element={<CoverLetter />} />
+        <Route path="/cv-landing" element={<CVLanding />} />
       </Routes>
     </Router>
   );

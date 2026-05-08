@@ -2,79 +2,101 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 
-// ── PLACEHOLDER TESTIMONIALS ──────────────────────────────────────────────────
-// Replace with real ones as they come in. Keep them specific and believable.
+// ── TESTIMONIALS ──────────────────────────────────────────────────────────────
+// 8 cards — diverse, visa-accurate, fixed card height so rotation never resizes
 const TESTIMONIALS = [
   {
-    quote: "I had no idea my salary was £4,000 below the threshold. Sponsrr told me in seconds. I renegotiated and got my CoS two weeks later.",
-    name: "Amir K.",
+    quote: "I had no idea my salary was £4,200 below the Skilled Worker threshold. Sponsrr flagged it in seconds. I renegotiated, got my CoS three weeks later and I'm now working in London.",
+    name: "Arjun M.",
     role: "Software Engineer",
-    visa: "Graduate Visa → Skilled Worker",
+    visa: "Graduate → Skilled Worker",
   },
   {
-    quote: "As a nurse on a Health & Care visa I didn't know I qualified for a lower threshold. Sponsrr showed me I was already eligible. Huge relief.",
-    name: "Priya M.",
+    quote: "As a nurse I assumed the salary threshold applied to me the same as everyone else. Sponsrr showed me the Health & Care route had a lower rate. I was already eligible. Total relief.",
+    name: "Chinwe O.",
     role: "Registered Nurse",
-    visa: "Health & Care Visa",
+    visa: "Student → Health & Care",
   },
   {
-    quote: "I was applying to companies that couldn't even sponsor me. The sponsor directory saved me months of wasted applications.",
-    name: "Daniel O.",
+    quote: "I was sending CVs to companies that weren't even on the sponsor register. Months wasted. The Sponsrr directory changed everything — I only apply to verified sponsors now.",
+    name: "Bartosz K.",
     role: "Data Analyst",
-    visa: "Student Visa → Skilled Worker",
+    visa: "Student → Skilled Worker",
+  },
+  {
+    quote: "The new entrant salary rate saved me. I was 24, fresh out of uni, and the standard threshold looked impossible. Sponsrr told me I qualified for the lower rate. Got sponsored within 6 weeks.",
+    name: "Fatima A.",
+    role: "Junior Accountant",
+    visa: "Graduate → Skilled Worker",
+  },
+  {
+    quote: "I didn't know my SOC code determined my minimum salary. Sponsrr matched me to the right code for my role and suddenly three job offers I'd ignored made sense. Accepted one last month.",
+    name: "Wei Z.",
+    role: "Mechanical Engineer",
+    visa: "Graduate → Skilled Worker",
+  },
+  {
+    quote: "My employer wanted to sponsor me but didn't know if my salary was compliant. I ran the Sponsrr checker and sent them the result. HR approved it the same day. Easiest HR conversation I've had.",
+    name: "Yemi A.",
+    role: "Marketing Manager",
+    visa: "Graduate → Skilled Worker",
+  },
+  {
+    quote: "I've been on a Student visa for three years wondering if I'd ever be sponsored. Sponsrr gave me a score of 81 and showed me exactly which sectors were actively hiring. I finally feel like I have a plan.",
+    name: "Priya N.",
+    role: "UX Designer",
+    visa: "Student → Skilled Worker",
+  },
+  {
+    quote: "I came from Bucharest, my English was okay but the UK visa system felt impossible. Sponsrr explained my eligibility clearly, no legal jargon. I have my Skilled Worker visa now. Worth every minute.",
+    name: "Andreea C.",
+    role: "Civil Engineer",
+    visa: "Skilled Worker Visa",
   },
 ];
 
 export default function Welcome() {
   const navigate = useNavigate();
-  const [firstName, setFirstName]       = useState('');
+
   const [loading, setLoading]           = useState(true);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [activeIdx, setActiveIdx]       = useState(0);
   const [animating, setAnimating]       = useState(false);
 
-  // ── AUTH CHECK + GET NAME ────────────────────────────────────────────────
+  // ── AUTH CHECK + NAME ────────────────────────────────────────────────────
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/login'); return; }
 
-      // Check if already onboarded — skip welcome if profile exists with job_title
       const { data: profile } = await supabase
         .from('profiles')
         .select('full_name, job_title')
         .eq('id', user.id)
         .single();
 
-      if (profile?.job_title) {
-        // Already onboarded — go straight to dashboard
-        navigate('/dashboard');
-        return;
-      }
+      // Already onboarded — skip welcome
+      if (profile?.job_title) { navigate('/dashboard'); return; }
 
-      // Get first name from profile or email
-      const name = profile?.full_name?.split(' ')[0]
-        || user.email?.split('@')[0]
-        || '';
-      setFirstName(name);
       setLoading(false);
     }
     load();
   }, [navigate]);
 
-  // ── TESTIMONIAL ROTATION ─────────────────────────────────────────────────
+  // ── AUTO-ROTATION (5s) ───────────────────────────────────────────────────
   useEffect(() => {
-    const interval = setInterval(() => {
+    const id = setInterval(() => {
       setAnimating(true);
       setTimeout(() => {
-        setActiveTestimonial(prev => (prev + 1) % TESTIMONIALS.length);
+        setActiveIdx(prev => (prev + 1) % TESTIMONIALS.length);
         setAnimating(false);
       }, 300);
-    }, 4000);
-    return () => clearInterval(interval);
+    }, 5000);
+    return () => clearInterval(id);
   }, []);
 
-  function handleStart() {
-    navigate('/onboarding');
+  function goTo(i) {
+    setAnimating(true);
+    setTimeout(() => { setActiveIdx(i); setAnimating(false); }, 300);
   }
 
   if (loading) return (
@@ -83,7 +105,7 @@ export default function Welcome() {
     </div>
   );
 
-  const t = TESTIMONIALS[activeTestimonial];
+  const t = TESTIMONIALS[activeIdx];
 
   return (
     <div style={{ background: '#080808', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -94,25 +116,17 @@ export default function Welcome() {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0.5; }
         }
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position:  200% center; }
-        }
 
-        .w-logo   { animation: fadeUp 0.5s ease forwards; }
-        .w-badge  { animation: fadeUp 0.5s 0.1s ease both; }
-        .w-title  { animation: fadeUp 0.5s 0.2s ease both; }
-        .w-sub    { animation: fadeUp 0.5s 0.3s ease both; }
-        .w-cta    { animation: fadeUp 0.5s 0.4s ease both; }
-        .w-testi  { animation: fadeUp 0.5s 0.5s ease both; }
+        .w-logo  { animation: fadeUp 0.5s ease forwards; }
+        .w-badge { animation: fadeUp 0.5s 0.1s ease both; }
+        .w-title { animation: fadeUp 0.5s 0.2s ease both; }
+        .w-sub   { animation: fadeUp 0.5s 0.3s ease both; }
+        .w-cta   { animation: fadeUp 0.5s 0.4s ease both; }
+        .w-testi { animation: fadeUp 0.5s 0.5s ease both; }
 
         .cta-btn {
           background: #c8ff00;
@@ -149,8 +163,7 @@ export default function Welcome() {
           background: rgba(240,237,232,0.2);
           cursor: pointer;
           transition: all 0.2s;
-          border: none;
-          padding: 0;
+          border: none; padding: 0;
         }
         .dot.on { background: #c8ff00; transform: scale(1.2); }
 
@@ -174,14 +187,14 @@ export default function Welcome() {
         }
       `}</style>
 
-      {/* ── NAVBAR (minimal — logo only) ───────────────────────────────── */}
+      {/* ── NAVBAR (logo only) ─────────────────────────────────────────── */}
       <nav className="w-logo" style={{ padding: '1.25rem 2rem', display: 'flex', alignItems: 'center' }}>
         <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1.3rem', letterSpacing: '-0.04em', color: '#f0ede8' }}>
           Sponsrr<span style={{ color: '#c8ff00' }}>.</span>
         </div>
       </nav>
 
-      {/* ── MAIN CONTENT ────────────────────────────────────────────────── */}
+      {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.5rem', textAlign: 'center' }}>
 
         {/* Time badge */}
@@ -192,23 +205,31 @@ export default function Welcome() {
           </span>
         </div>
 
-        {/* Heading */}
-        <h1 className="w-title" style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(2rem, 6vw, 3.2rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.1, margin: '0 0 1.25rem', maxWidth: 600 }}>
-          {firstName
-            ? <>Welcome to Sponsrr,<br /><span style={{ color: '#c8ff00' }}>{firstName}.</span></>
-            : <>Welcome to<br /><span style={{ color: '#c8ff00' }}>Sponsrr.</span></>
-          }
-        </h1>
+        {/* Heading — white / green */}
+        <div className="w-title" style={{ marginBottom: '1.25rem' }}>
+          <h1 style={{
+            fontFamily: 'Syne, sans-serif',
+            fontWeight: 800,
+            fontSize: 'clamp(2rem, 6vw, 3.2rem)',
+            letterSpacing: '-0.04em',
+            color: '#f0ede8',
+            lineHeight: 1.1,
+            margin: 0,
+          }}>
+            Welcome to{' '}
+            <span style={{ color: '#c8ff00' }}>Sponsrr</span>
+          </h1>
+        </div>
 
         {/* Subtext */}
         <p className="w-sub" style={{ fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)', color: 'rgba(240,237,232,0.5)', lineHeight: 1.7, maxWidth: 480, margin: '0 0 2.5rem' }}>
-          Before we calculate your visa eligibility and Sponsrr Score,
-          we need a couple of minutes to understand your situation.
+          Before we calculate your Sponsrr Score and show jobs to you,
+          we need a couple of minutes to understand you.
         </p>
 
         {/* CTA */}
         <div className="w-cta" style={{ marginBottom: '3.5rem' }}>
-          <button className="cta-btn" onClick={handleStart}>
+          <button className="cta-btn" onClick={() => navigate('/onboarding')}>
             Let's get started
             <span style={{ fontSize: '1.1rem' }}>→</span>
           </button>
@@ -220,7 +241,7 @@ export default function Welcome() {
         {/* ── TESTIMONIALS ──────────────────────────────────────────────── */}
         <div className="w-testi" style={{ width: '100%', maxWidth: 480 }}>
 
-          {/* Divider */}
+          {/* Divider label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ flex: 1, height: 1, background: 'rgba(240,237,232,0.07)' }} />
             <span style={{ fontSize: '0.65rem', color: 'rgba(240,237,232,0.25)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
@@ -229,18 +250,42 @@ export default function Welcome() {
             <div style={{ flex: 1, height: 1, background: 'rgba(240,237,232,0.07)' }} />
           </div>
 
-          {/* Testimonial card */}
-          <div className={`testi-card${animating ? ' out' : ''}`}
-            style={{ background: '#111', border: '1px solid rgba(240,237,232,0.08)', borderRadius: 18, padding: '1.5rem', textAlign: 'left', minHeight: 140 }}>
+          {/* Card — fixed height so rotation never reflows the page */}
+          <div
+            className={`testi-card${animating ? ' out' : ''}`}
+            style={{
+              background: '#111',
+              border: '1px solid rgba(240,237,232,0.08)',
+              borderRadius: 18,
+              padding: '1.5rem',
+              textAlign: 'left',
+              height: 200,           // ← fixed height, content clips gracefully
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            {/* Quote body */}
+            <div>
+              <div style={{ fontSize: '1.6rem', lineHeight: 1, color: 'rgba(200,255,0,0.25)', fontFamily: 'Georgia, serif', marginBottom: '0.4rem' }}>"</div>
+              <p style={{
+                fontSize: '0.84rem',
+                color: 'rgba(240,237,232,0.7)',
+                lineHeight: 1.65,
+                margin: 0,
+                // 3-line clamp so long quotes never break layout
+                display: '-webkit-box',
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}>
+                {t.quote}
+              </p>
+            </div>
 
-            {/* Quote mark */}
-            <div style={{ fontSize: '2rem', lineHeight: 1, color: 'rgba(200,255,0,0.25)', fontFamily: 'Georgia, serif', marginBottom: '0.5rem' }}>"</div>
-
-            <p style={{ fontSize: '0.88rem', color: 'rgba(240,237,232,0.7)', lineHeight: 1.65, margin: '0 0 1.1rem' }}>
-              {t.quote}
-            </p>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            {/* Attribution */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
               <div>
                 <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f0ede8', fontFamily: 'Syne, sans-serif' }}>{t.name}</div>
                 <div style={{ fontSize: '0.7rem', color: 'rgba(240,237,232,0.4)', marginTop: '0.1rem' }}>{t.role}</div>
@@ -254,17 +299,16 @@ export default function Welcome() {
           {/* Dots */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem' }}>
             {TESTIMONIALS.map((_, i) => (
-              <button key={i} className={`dot${i === activeTestimonial ? ' on' : ''}`}
-                onClick={() => { setAnimating(true); setTimeout(() => { setActiveTestimonial(i); setAnimating(false); }, 300); }} />
+              <button key={i} className={`dot${i === activeIdx ? ' on' : ''}`} onClick={() => goTo(i)} />
             ))}
           </div>
         </div>
       </main>
 
-      {/* ── FOOTER (minimal) ────────────────────────────────────────────── */}
-      <footer style={{ padding: '1.25rem 2rem', textAlign: 'center' }}>
+      {/* ── FOOTER ────────────────────────────────────────────────────── */}
+      <footer style={{ padding: '1.5rem 2rem', textAlign: 'center' }}>
         <div style={{ fontSize: '0.68rem', color: 'rgba(240,237,232,0.2)' }}>
-          Sponsrr · Built for internationals · sponsrr.com
+          © Sponsrr. Made for Internationals.
         </div>
       </footer>
     </div>

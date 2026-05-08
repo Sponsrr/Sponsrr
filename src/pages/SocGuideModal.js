@@ -95,7 +95,7 @@ function SocDetailPopup({ soc, onClose, onSelect }) {
         {canSelect ? (
           <button onClick={() => { onSelect(soc); onClose(); }}
             style={{ width: '100%', background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 100, padding: '0.85rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer' }}>
-            Use SOC {soc.code} for my calculation →
+            Use SOC {soc.code} for calculation →
           </button>
         ) : (
           <div style={{ background: 'rgba(255,77,0,0.06)', border: '1px solid rgba(255,77,0,0.15)', borderRadius: 12, padding: '0.85rem 1rem', textAlign: 'center', fontSize: '0.78rem', color: 'rgba(255,77,0,0.8)' }}>
@@ -115,7 +115,6 @@ export default function SocGuideModal({ onClose, onSelect }) {
   const [expanded, setExpanded] = useState(null);
   const searchRef = useRef(null);
 
-  useEffect(() => { searchRef.current?.focus(); }, []);
 
   useEffect(() => {
     let list = [...SOC_DATABASE];
@@ -158,9 +157,11 @@ export default function SocGuideModal({ onClose, onSelect }) {
         maxWidth: 620, margin: '0 auto',
         height: '90vh',
         display: 'flex', flexDirection: 'column',
+        animation: 'slideUp 0.35s ease forwards',
       }}>
         <style>{`
-          .soc-pills { display:flex; gap:0.35rem; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .soc-pills { display:flex; gap:0.35rem; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
           .soc-pills::-webkit-scrollbar { display:none; }
           .soc-legend { display:flex; gap:1rem; overflow-x:auto; scrollbar-width:none; padding-bottom:1px; }
           .soc-legend::-webkit-scrollbar { display:none; }
@@ -174,7 +175,7 @@ export default function SocGuideModal({ onClose, onSelect }) {
 
         {/* Header */}
         <div style={{ padding: '0.85rem 1.25rem 0', flexShrink: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <div>
               <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1rem', color: '#f0ede8' }}>SOC Code Guide</div>
               <div style={{ fontSize: '0.67rem', color: 'rgba(240,237,232,0.4)', marginTop: '0.15rem' }}>
@@ -184,13 +185,30 @@ export default function SocGuideModal({ onClose, onSelect }) {
             <button onClick={onClose} style={{ background: 'rgba(240,237,232,0.07)', border: 'none', borderRadius: '50%', width: 30, height: 30, color: 'rgba(240,237,232,0.5)', cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✕</button>
           </div>
 
+          {/* ── SOC info box — always visible ── */}
+          <div style={{
+            background: 'rgba(200,255,0,0.03)',
+            border: '1px solid rgba(200,255,0,0.1)',
+            borderRadius: 10,
+            padding: '0.65rem 0.9rem',
+            marginBottom: '0.75rem',
+            display: 'flex',
+            gap: '0.5rem',
+            alignItems: 'flex-start',
+          }}>
+            <span style={{ fontSize: '0.72rem', color: 'rgba(200,255,0,0.35)', flexShrink: 0, marginTop: '0.05rem' }}>ⓘ</span>
+            <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(200,255,0,0.4)', lineHeight: 1.6 }}>
+              Your SOC code determines whether your role is eligible for sponsorship, sets the minimum salary your employer must pay you (the "going rate"), and confirms your job is skilled enough to qualify. Getting it right matters.
+            </p>
+          </div>
+
           {/* Search */}
           <input ref={searchRef} type="text"
             placeholder="Search job title, SOC code or keyword..."
             value={query} onChange={e => setQuery(e.target.value)}
             style={{ background: 'rgba(240,237,232,0.07)', border: '1px solid rgba(200,255,0,0.25)', borderRadius: 10, padding: '0.65rem 1rem', color: '#f0ede8', fontSize: '0.85rem', fontFamily: 'inherit', outline: 'none', width: '100%', marginBottom: '0.7rem' }} />
 
-          {/* Filter pills — swipeable single line */}
+          {/* Filter pills */}
           <div className="soc-pills" style={{ marginBottom: '0.65rem' }}>
             {filterTabs.map(f => (
               <button key={f.value}
@@ -220,7 +238,7 @@ export default function SocGuideModal({ onClose, onSelect }) {
             ))}
           </div>
 
-          {/* Legend — compact single horizontal line, no wrap */}
+          {/* Legend */}
           <div className="soc-legend" style={{ marginBottom: '0.7rem' }}>
             {[
               { color: '#c8ff00', label: 'Higher Skilled' },
@@ -235,7 +253,7 @@ export default function SocGuideModal({ onClose, onSelect }) {
           </div>
         </div>
 
-        {/* Scrollable list — no limit */}
+        {/* Scrollable list */}
         <div style={{ overflowY: 'auto', flex: 1, padding: '0 1.25rem 2rem' }}>
           {results.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
@@ -247,33 +265,18 @@ export default function SocGuideModal({ onClose, onSelect }) {
               const t = getTierStyle(soc.tier);
               return (
                 <button key={soc.code} className="soc-row" onClick={() => setExpanded(soc)}>
-
-                  {/* SOC code — coloured by tier, DM Sans bold, vertical divider */}
                   <div style={{
                     flexShrink: 0, width: 64,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     borderRight: '1px solid rgba(240,237,232,0.07)',
                     padding: '0.7rem 0',
                   }}>
-                    <span style={{
-                      fontFamily: 'DM Sans, sans-serif',
-                      fontWeight: 700,
-                      fontSize: '0.8rem',
-                      color: t.color,
-                      letterSpacing: '0.02em',
-                    }}>
+                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.8rem', color: t.color, letterSpacing: '0.02em' }}>
                       {soc.code}
                     </span>
                   </div>
-
-                  {/* Title + sector + rate */}
                   <div style={{ flex: 1, minWidth: 0, padding: '0.7rem 0.6rem', textAlign: 'left' }}>
-                    <div style={{
-                      fontSize: '0.78rem', fontWeight: 600,
-                      color: soc.tier === 'ineligible' ? 'rgba(240,237,232,0.38)' : '#f0ede8',
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      lineHeight: 1.3, marginBottom: '0.12rem',
-                    }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 600, color: soc.tier === 'ineligible' ? 'rgba(240,237,232,0.38)' : '#f0ede8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3, marginBottom: '0.12rem' }}>
                       {soc.title}
                     </div>
                     <div style={{ fontSize: '0.62rem', color: 'rgba(240,237,232,0.28)', display: 'flex', gap: '0.3rem', overflow: 'hidden' }}>
@@ -281,15 +284,8 @@ export default function SocGuideModal({ onClose, onSelect }) {
                       {soc.rate && <span style={{ color: 'rgba(200,255,0,0.4)', flexShrink: 0 }}>· {fmt(soc.rate)}/yr</span>}
                     </div>
                   </div>
-
-                  {/* Tier badge + arrow */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.7rem 0.65rem 0.7rem 0', flexShrink: 0 }}>
-                    <span style={{
-                      background: t.bg, border: `1px solid ${t.border}`,
-                      borderRadius: 100, padding: '0.16rem 0.48rem',
-                      fontSize: '0.57rem', fontWeight: 700, color: t.color,
-                      whiteSpace: 'nowrap',
-                    }}>
+                    <span style={{ background: t.bg, border: `1px solid ${t.border}`, borderRadius: 100, padding: '0.16rem 0.48rem', fontSize: '0.57rem', fontWeight: 700, color: t.color, whiteSpace: 'nowrap' }}>
                       {t.short}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: t.color, opacity: 0.45 }}>›</span>

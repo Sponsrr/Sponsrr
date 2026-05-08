@@ -15,7 +15,15 @@ function Dashboard() {
       setProfile(data);
       setLoading(false);
     }
+
+    // Load immediately
     loadProfile();
+
+    // Re-fetch silently every time the user comes back to this page
+    // (e.g. after editing profile and pressing back)
+    function handleFocus() { loadProfile(); }
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   if (loading) return (
@@ -23,7 +31,6 @@ function Dashboard() {
       <div style={{ color:'rgba(240,237,232,0.4)', fontSize:'0.9rem' }}>Loading...</div>
     </div>
   );
-
 
   const features = [
     {
@@ -69,7 +76,7 @@ function Dashboard() {
     {
       icon:'📄', label:'AI CV Builder',
       desc:'Visa-optimised and ATS friendly CV built under minutes.',
-      href:'/cv-builder',
+      href:'/cv-landing',
       tag:'Exclusive', tagColor:'rgba(255,77,0,0.1)', tagText:'#ff4d00bf',
       backBg:'rgba(255,200,0,0.05)', backBorder:'rgba(255,200,0,0.2)',
       dotColor:'#ffc800', accessText:'Requires Monthly & above', accessColor:'rgba(255,200,0,0.8)',
@@ -108,6 +115,34 @@ function Dashboard() {
     },
   ];
 
+  // ── COMPLETENESS CALCULATION ─────────────────────────────────────────────
+  const completenessFields = [
+    { key: 'full_name',           label: 'Full name' },
+    { key: 'job_title',           label: 'Job title' },
+    { key: 'soc_code',            label: 'SOC code' },
+    { key: 'experience',          label: 'Experience' },
+    { key: 'current_visa',        label: 'Visa status' },
+    { key: 'age',                 label: 'Age' },
+    { key: 'degree',              label: 'Qualification' },
+    { key: 'preferred_locations', label: 'Locations' },
+    { key: 'target_salary_band',  label: 'Salary target' },
+  ];
+
+  const filledFields = completenessFields.filter(f => {
+    const v = profile?.[f.key];
+    if (Array.isArray(v)) return v.length > 0;
+    return v !== null && v !== undefined && v !== '';
+  });
+
+  const missingFields = completenessFields.filter(f => {
+    const v = profile?.[f.key];
+    if (Array.isArray(v)) return v.length === 0;
+    return v === null || v === undefined || v === '';
+  });
+
+  const completePct = Math.round((filledFields.length / completenessFields.length) * 100);
+  const showStrip   = completePct < 80;
+
   return (
     <Layout>
       <div style={{ background:'#080808', minHeight:'100vh' }}>
@@ -116,7 +151,6 @@ function Dashboard() {
           @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
           .dash-blink { animation: blink 1.6s ease infinite; }
 
-          /* ── HOVER STATES ───────────────────────────────────── */
           .cta-plan-btn { transition: background 0.2s, color 0.2s, border 0.2s !important; }
           .cta-plan-btn:hover { background: #080808 !important; color: #c8ff00 !important; border: 1px solid #c8ff00 !important; }
           .upgrade-pill { transition: background 0.2s !important; }
@@ -124,86 +158,58 @@ function Dashboard() {
           .avatar-btn { transition: transform 0.2s, box-shadow 0.2s !important; }
           .avatar-btn:hover { transform: scale(1.09) !important; box-shadow: 0 0 0 2px #c8ff00 !important; }
 
-          /* ── STACKED CARD SYSTEM ────────────────────────────── */
-          :root {
-            --card-h: 190px;
-            --peek:    28px;
-          }
+          :root { --card-h: 190px; --peek: 28px; }
 
           .feat-link {
-            text-decoration: none;
-            display: block;
+            text-decoration: none; display: block;
             position: relative;
             height: calc(var(--card-h) + var(--peek));
           }
-
           .feat-front {
-            position: absolute;
-            top: 0; left: 0; right: 0;
+            position: absolute; top: 0; left: 0; right: 0;
             height: var(--card-h);
-            background: #111;
-            border: 1px solid rgba(240,237,232,0.08);
-            border-radius: 18px;
-            padding: 1.3rem;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            z-index: 2;
-            overflow: hidden;
+            background: #111; border: 1px solid rgba(240,237,232,0.08);
+            border-radius: 18px; padding: 1.3rem; box-sizing: border-box;
+            display: flex; flex-direction: column;
+            z-index: 2; overflow: hidden;
             transition: border-color 0.25s ease, transform 0.25s ease;
           }
-
           .feat-back {
-            position: absolute;
-            top: var(--peek);
-            left: 0; right: 0;
-            height: var(--card-h);
-            border-radius: 18px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding-bottom: 9px;
-            box-sizing: border-box;
+            position: absolute; top: var(--peek); left: 0; right: 0;
+            height: var(--card-h); border-radius: 18px;
+            display: flex; align-items: flex-end; justify-content: center;
+            padding-bottom: 9px; box-sizing: border-box;
             transition: transform 0.25s ease;
           }
+          .feat-link:hover .feat-front { border-color: rgba(200,255,0,0.25) !important; transform: translateY(-3px); }
+          .feat-link:hover .feat-back  { transform: translateY(-3px); }
 
-          .feat-link:hover .feat-front {
-            border-color: rgba(200,255,0,0.25) !important;
-            transform: translateY(-3px);
-          }
-          .feat-link:hover .feat-back {
-            transform: translateY(-3px);
-          }
-
-          /* Grid */
           .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-            align-items: start;
+            gap: 1.5rem; margin-bottom: 3rem; align-items: start;
+          }
+
+          .complete-chip {
+            background: rgba(240,237,232,0.04);
+            border: 1px solid rgba(240,237,232,0.1);
+            border-radius: 100px; padding: 0.18rem 0.6rem;
+            font-size: 0.68rem; color: rgba(240,237,232,0.4); font-weight: 500;
           }
 
           @media(max-width:768px) {
             .dash-desktop-nav { display: none !important; }
             .dash-hamburger   { display: flex !important; }
-            .feature-grid {
-              grid-template-columns: 1fr 1fr !important;
-              gap: 0.85rem !important;
-            }
-            :root {
-              --card-h: 185px;
-              --peek:   30px;
-            }
+            .feature-grid { grid-template-columns: 1fr 1fr !important; gap: 0.85rem !important; }
+            :root { --card-h: 185px; --peek: 30px; }
+            .strip-row { flex-direction: column !important; align-items: stretch !important; }
+            .strip-bar-wrap { width: 100% !important; }
           }
-
         `}</style>
-
-        {/* Mobile menu */}
 
         <div style={{ maxWidth:1100, margin:'0 auto', padding:'6rem 2rem 4rem' }}>
 
-          {/* Header */}
+          {/* ── HEADER ── */}
           <div style={{ marginBottom:'2.5rem' }}>
             <div style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', background:'rgba(200,255,0,0.08)', border:'1px solid rgba(200,255,0,0.2)', padding:'0.35rem 1rem', borderRadius:'100px', fontSize:'0.75rem', color:'#c8ff00', fontWeight:600, marginBottom:'1rem' }}>
               <span className="dash-blink" style={{ width:6, height:6, background:'#c8ff00', borderRadius:'50%', display:'inline-block' }} />
@@ -217,47 +223,90 @@ function Dashboard() {
             </p>
           </div>
 
-          {/* Feature cards */}
+          {/* ── COMPLETENESS STRIP — only when < 80% ── */}
+          {showStrip && (
+            <div style={{
+              background: 'rgba(200,255,0,0.03)',
+              border: '1px solid rgba(200,255,0,0.12)',
+              borderRadius: 18,
+              padding: '1.1rem 1.4rem',
+              marginBottom: '2rem',
+            }}>
+              {/* Top row: label + bar + CTA */}
+              <div className="strip-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: missingFields.length > 0 ? '0.75rem' : 0 }}>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1, minWidth: 0 }}>
+                  <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.85rem', color: '#f0ede8', whiteSpace: 'nowrap' }}>
+                    Profile {completePct}% complete
+                  </span>
+                  {/* Bar */}
+                  <div className="strip-bar-wrap" style={{ flex: 1, height: 5, background: 'rgba(240,237,232,0.06)', borderRadius: 100, overflow: 'hidden', minWidth: 60 }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${completePct}%`,
+                      background: 'linear-gradient(90deg, rgba(200,255,0,0.6), #c8ff00)',
+                      borderRadius: 100,
+                      boxShadow: '0 0 8px rgba(200,255,0,0.25)',
+                      transition: 'width 0.8s ease',
+                    }} />
+                  </div>
+                </div>
+
+                <a
+                  href="/profile/edit"
+                  style={{
+                    flexShrink: 0,
+                    background: '#c8ff00', color: '#080808',
+                    fontSize: '0.75rem', fontWeight: 700,
+                    padding: '0.4rem 1.1rem', borderRadius: 100,
+                    textDecoration: 'none', whiteSpace: 'nowrap',
+                    transition: 'all 0.2s ease',
+                    display: 'inline-block',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#aee600'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#c8ff00'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  Complete profile →
+                </a>
+              </div>
+
+              {/* Missing field chips */}
+              {missingFields.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.67rem', color: 'rgba(240,237,232,0.28)', marginRight: '0.1rem' }}>Missing:</span>
+                  {missingFields.map(f => (
+                    <span key={f.key} className="complete-chip">{f.label}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── FEATURE CARDS ── */}
           <div className="feature-grid">
             {features.map(item => (
               <a key={item.label} href={item.href} className="feat-link">
-
-                {/* Back card — peeks out below front */}
-                <div className="feat-back" style={{
-                  background: item.backBg,
-                  border: `1px solid ${item.backBorder}`,
-                }}>
+                <div className="feat-back" style={{ background: item.backBg, border: `1px solid ${item.backBorder}` }}>
                   <div style={{ display:'flex', alignItems:'center', gap:5 }}>
                     <div style={{ width:5, height:5, borderRadius:'50%', background:item.dotColor, flexShrink:0 }} />
                     <span style={{ fontSize:'0.62rem', color:item.accessColor, fontWeight:400 }}>{item.accessText}</span>
                   </div>
                 </div>
-
-                {/* Front card */}
                 <div className="feat-front">
-                  {/* Tag pill */}
-                  <div style={{
-                    position:'absolute', top:'1rem', right:'1rem',
-                    background:item.tagColor, color:item.tagText,
-                    fontSize:'0.55rem', fontWeight:600,
-                    letterSpacing:'0.1em', textTransform:'uppercase',
-                    padding:'0.2rem 0.5rem', borderRadius:'100px',
-                  }}>
+                  <div style={{ position:'absolute', top:'1rem', right:'1rem', background:item.tagColor, color:item.tagText, fontSize:'0.55rem', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', padding:'0.2rem 0.5rem', borderRadius:'100px' }}>
                     {item.tag}
                   </div>
-
                   <div style={{ fontSize:'1.4rem', marginBottom:'0.6rem' }}>{item.icon}</div>
                   <div style={{ fontFamily:'Syne, sans-serif', fontWeight:700, fontSize:'0.88rem', color:'#f0ede8', marginBottom:'0.3rem', lineHeight:1.2 }}>{item.label}</div>
                   <div style={{ fontSize:'0.74rem', color:'rgba(240,237,232,0.4)', lineHeight:1.5, fontWeight:400 }}>{item.desc}</div>
                 </div>
-
               </a>
             ))}
           </div>
 
-          {/* Upgrade CTA */}
+          {/* ── UPGRADE CTA ── */}
           <div style={{ background:'linear-gradient(135deg, rgba(200,255,0,0.06) 0%, rgba(255,77,0,0.04) 100%)', border:'1px solid rgba(200,255,0,0.12)', borderRadius:20, padding:'2rem', marginBottom:'2.5rem' }}>
-            <style>{`.cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; } .cta-btn { white-space: nowrap; } @media(max-width:768px) { .cta-inner { flex-direction: column; align-items: stretch; } .cta-btn { text-align: center; } }`}</style>
+            <style>{`.cta-inner { display:flex; align-items:center; justify-content:space-between; gap:1rem; } .cta-btn { white-space:nowrap; } @media(max-width:768px){ .cta-inner { flex-direction:column; align-items:stretch; } .cta-btn { text-align:center; } }`}</style>
             <div className="cta-inner">
               <div>
                 <div style={{ fontFamily:'Syne, sans-serif', fontWeight:800, fontSize:'1.1rem', color:'#f0ede8', marginBottom:'0.3rem' }}>Unlock the unfair advantage.</div>
@@ -269,21 +318,21 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* Profile summary */}
+          {/* ── PROFILE SUMMARY ── */}
           {profile && (
             <div style={{ background:'#111', border:'1px solid rgba(240,237,232,0.07)', borderRadius:20, padding:'1.8rem' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.2rem' }}>
                 <div style={{ fontFamily:'Syne, sans-serif', fontWeight:700, fontSize:'1rem', color:'#f0ede8' }}>Your profile</div>
-                <a href="/profile" style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.35)', textDecoration:'none', border:'1px solid rgba(240,237,232,0.1)', padding:'0.3rem 0.8rem', borderRadius:'100px' }}>Edit</a>
+                <a href="/profile/edit" style={{ fontSize:'0.75rem', color:'rgba(240,237,232,0.35)', textDecoration:'none', border:'1px solid rgba(240,237,232,0.1)', padding:'0.3rem 0.8rem', borderRadius:'100px' }}>Edit</a>
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:'1rem' }}>
                 {[
-                  { label:'Job title', value: profile.job_title || 'Not set' },
-                  { label:'Experience', value: profile.experience || 'Not set' },
-                  { label:'Status', value: profile.is_new_entrant ? '✓ New entrant' : 'Experienced worker' },
-                  { label:'Target salary', value: profile.target_salary_band || 'Not set' },
-                  { label:'Locations', value: profile.preferred_locations?.join(', ') || 'Not set' },
-                  { label:'University', value: profile.university || '—' },
+                  { label:'Job title',     value: profile.job_title || 'Not set' },
+                  { label:'Experience',    value: profile.experience || 'Not set' },
+                  { label:'Status',        value: profile.is_new_entrant ? '✓ New entrant' : 'Experienced worker' },
+                  { label:'Target salary', value: Array.isArray(profile.target_salary_band) ? profile.target_salary_band.join(', ') : profile.target_salary_band || 'Not set' },
+                  { label:'Locations',     value: profile.preferred_locations?.join(', ') || 'Not set' },
+                  { label:'University',    value: profile.university || '—' },
                 ].map(item => (
                   <div key={item.label}>
                     <div style={{ fontSize:'0.7rem', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(240,237,232,0.35)', marginBottom:'0.3rem' }}>{item.label}</div>

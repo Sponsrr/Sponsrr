@@ -332,7 +332,7 @@ if (saveError) { setError('Failed to save. Please try again.'); return; }
             {/* ── PERSONAL ── */}
             <Section title="Personal" subtitle="Basic info used across your profile">
               <Field label="Full name">
-                <input className="fi" style={inputStyle} type="text" placeholder="e.g. Priya Sharma"
+                <input className="fi" style={inputStyle} type="text" placeholder="e.g. John Smith"
                   value={form.full_name} onChange={e => update('full_name', e.target.value)} />
               </Field>
             </Section>
