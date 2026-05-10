@@ -80,7 +80,7 @@ function AnimatedNumber({ value, duration = 1200 }) {
   return <>{display.toLocaleString()}</>;
 }
 
-// ── CV PAGE SVG GRAPHIC ───────────────────────────────────────────────────────
+// ── CV PAGE CANVAS GRAPHIC ────────────────────────────────────────────────────
 function CVGraphic() {
   const canvasRef = React.useRef(null);
 
@@ -270,38 +270,38 @@ function CVGraphic() {
 // ── TESTIMONIALS ──────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
   {
-    quote: "I rebuilt my CV on Sponsrr targeting FAANG roles. The AI rewrote every bullet point to be metric-heavy and achievement-first. Three callbacks in the first week. Accepted an offer at a top five tech company.",
-    name: "Arjun M.",
+    quote: "I used Sponsrr while applying for software engineering roles and it made my CV much sharper. The biggest change was how my projects and impact were presented. I started getting stronger responses and eventually landed a FAANG role.",
+    name: "Ahmed M.",
     role: "Software Engineer",
     outcome: "Landed FAANG role ✓",
   },
   {
-    quote: "My old CV was full of 'responsible for' and 'passionate about'. The Sponsrr version cut all of it. Sharp, human, no filler. Got called by a luxury fashion brand I had already written off as too competitive.",
-    name: "Priya V.",
+    quote: "My CV had the right experience, but it was not coming across well. Sponsrr helped me make it cleaner, more focused, and better suited to the kind of brand roles I wanted. I later secured an offer with a luxury fashion brand.",
+    name: "Patrick V.",
     role: "Brand Consultant",
     outcome: "Luxury brand offer ✓",
   },
   {
-    quote: "I had never heard of ATS before. Sponsrr explained it and rebuilt my CV to pass it. Of five companies I applied to, all five came back. That had never happened before.",
-    name: "Fatima A.",
+    quote: "Before using Sponsrr, I did not fully understand how much CV structure and ATS formatting mattered. The new version made my experience easier to scan and helped me get responses from every company I applied to that week.",
+    name: "Ferguson A.",
     role: "Marketing Manager",
     outcome: "5 from 5 ATS passes ✓",
   },
   {
-    quote: "The healthcare template understood clinical language and NHS formatting. I did not have to explain anything. Uploaded my experience, got a CV that looked like an NHS HR team had written it.",
+    quote: "The healthcare CV felt much closer to what NHS employers expect. I still reviewed and adjusted the final version myself, but Sponsrr gave me a much stronger structure and wording. It helped me secure an NHS Trust offer.",
     name: "Raza A.",
     role: "Junior Doctor",
     outcome: "NHS Trust offer ✓",
   },
   {
-    quote: "I had been on a Graduate visa for 14 months with no offers. New CV, same experience. The difference was the writing. Got two sponsored offers within a month.",
-    name: "Ji-ho L.",
+    quote: "I had been applying on a Graduate visa and knew my CV needed to work harder. Sponsrr helped me present my experience in a clearer, more UK-focused way. Within a month, I had two sponsored offers.",
+    name: "Xin-ho J.",
     role: "Data Analyst",
     outcome: "Sponsored offer secured ✓",
   },
   {
-    quote: "The MBB template knew exactly what McKinsey screeners look for. Problem, action, outcome on every line. Numbers everywhere. Got my first consulting interview in three years of trying.",
-    name: "Sofia C.",
+    quote: "The consulting template helped me move away from listing responsibilities and focus more on problems, actions, and outcomes. That made the CV feel much more structured. It helped me secure my first consulting interview in years.",
+    name: "Torina C.",
     role: "Business Analyst",
     outcome: "Big 4 interview secured ✓",
   },
@@ -310,13 +310,13 @@ const TESTIMONIALS = [
 // ── STEP CARD ─────────────────────────────────────────────────────────────────
 function StepCard({ number, title, desc }) {
   return (
-    <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
-      <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(200,255,0,0.1)', border: '1px solid rgba(200,255,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '0.88rem', color: '#c8ff00', flexShrink: 0 }}>
+    <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+      <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(200,255,0,0.1)', border: '1px solid rgba(200,255,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '0.85rem', color: '#c8ff00', flexShrink: 0 }}>
         {number}
       </div>
       <div>
-        <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.92rem', color: '#f0ede8', marginBottom: '0.3rem' }}>{title}</div>
-        <div style={{ fontSize: '0.78rem', color: 'rgba(240,237,232,0.45)', lineHeight: 1.65 }}>{desc}</div>
+        <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.9rem', color: '#f0ede8', marginBottom: '0.25rem' }}>{title}</div>
+        <div style={{ fontSize: '0.76rem', color: 'rgba(240,237,232,0.45)', lineHeight: 1.6 }}>{desc}</div>
       </div>
     </div>
   );
@@ -326,14 +326,14 @@ function StepCard({ number, title, desc }) {
 function IndustryCard({ icon, title, desc, accent }) {
   return (
     <div
-      style={{ background: '#111', border: `1px solid ${accent}22`, borderRadius: 16, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', transition: 'all 0.2s ease' }}
+      style={{ background: '#111', border: `1px solid ${accent}22`, borderRadius: 16, padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s ease' }}
       onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}55`; e.currentTarget.style.transform = 'translateY(-2px)'; }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = `${accent}22`; e.currentTarget.style.transform = 'translateY(0)'; }}>
-      <div style={{ fontSize: '1.4rem' }}>{icon}</div>
-      <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.85rem', color: '#f0ede8' }}>{title}</div>
-      <div style={{ fontSize: '0.72rem', color: 'rgba(240,237,232,0.4)', lineHeight: 1.6, flex: 1 }}>{desc}</div>
+      <div style={{ fontSize: '1.3rem' }}>{icon}</div>
+      <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: '0.82rem', color: '#f0ede8' }}>{title}</div>
+      <div style={{ fontSize: '0.7rem', color: 'rgba(240,237,232,0.4)', lineHeight: 1.55, flex: 1 }}>{desc}</div>
       <div>
-        <span style={{ background: `${accent}18`, border: `1px solid ${accent}40`, borderRadius: 100, padding: '0.18rem 0.65rem', fontSize: '0.6rem', fontWeight: 700, color: accent }}>Optimised template</span>
+        <span style={{ background: `${accent}18`, border: `1px solid ${accent}40`, borderRadius: 100, padding: '0.15rem 0.6rem', fontSize: '0.58rem', fontWeight: 700, color: accent }}>Optimised template</span>
       </div>
     </div>
   );
@@ -348,7 +348,6 @@ export default function CVLanding() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [animating, setAnimating] = useState(false);
 
-  // Auto-rotate testimonials every 5s
   useEffect(() => {
     const id = setInterval(() => {
       setAnimating(true);
@@ -385,6 +384,7 @@ export default function CVLanding() {
           @keyframes fu  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
           @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
           @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+          @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-100%)} }
           .fu  { animation:fu 0.6s ease forwards; }
           .fu2 { animation:fu 0.6s 0.15s ease both; }
           .fu3 { animation:fu 0.6s 0.3s ease both; }
@@ -392,82 +392,127 @@ export default function CVLanding() {
           .float { animation:float 4s ease-in-out infinite; }
           .primary-btn:hover   { background:#aee600!important; transform:translateY(-2px)!important; box-shadow:0 8px 24px rgba(200,255,0,0.3)!important; }
           .secondary-btn:hover { background:rgba(240,237,232,0.08)!important; border-color:rgba(240,237,232,0.5)!important; transform:translateY(-2px)!important; }
-          .industry-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+          .industry-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.85rem; }
           .testi-card { transition:opacity 0.3s ease,transform 0.3s ease; }
           .testi-card.out { opacity:0; transform:translateY(8px); }
           .dot { width:6px;height:6px;border-radius:50%;background:rgba(240,237,232,0.2);cursor:pointer;transition:all 0.2s;border:none;padding:0; }
           .dot.on { background:#c8ff00;transform:scale(1.2); }
-          .blinking-dot { width:7px;height:7px;border-radius:50%;background:#c8ff00;animation:pulse 1.5s ease-in-out infinite;display:inline-block; }
-          @media(max-width:900px){ .industry-grid{grid-template-columns:repeat(2,1fr)!important;} }
-          @media(max-width:580px){ .industry-grid{grid-template-columns:1fr!important;} .hero-flex{flex-direction:column!important;} .stats-grid{grid-template-columns:1fr 1fr!important;} }
           .ticker-track { display:flex; overflow:hidden; }
-  .ticker-inner { display:flex; align-items:center; animation:ticker 40s linear infinite; }
-  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-100%)} }
-  .ticker-track:hover .ticker-inner { animation-play-state:paused; }
+          .ticker-inner { display:flex; align-items:center; animation:ticker 40s linear infinite; }
+          .ticker-track:hover .ticker-inner { animation-play-state:paused; }
+          .hero-section { padding-top:7rem; padding-bottom:5rem; }
+          .hero-flex { display:flex; align-items:center; gap:3rem; }
+          .hero-graphic { flex-shrink:0; width:280px; }
+          .hero-btns { display:flex; gap:0.75rem; flex-wrap:wrap; }
+          .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; max-width:820px; margin:0 auto; }
+          .why-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.85rem; }
+          .cta-btns { display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; }
+
+          @media(max-width:768px) {
+            .industry-grid { grid-template-columns:repeat(2,1fr)!important; }
+            .why-grid { grid-template-columns:repeat(2,1fr)!important; }
+            .steps-grid { grid-template-columns:1fr!important; gap:1.5rem!important; }
+          }
+
+          @media(max-width:580px) {
+  .hero-section { 
+    padding-top:5rem!important; 
+    padding-bottom:1.25rem!important; 
+  }
+
+  .hero-flex { 
+    flex-direction:column!important; 
+    align-items:flex-start!important; 
+    gap:0.25rem!important; 
+  }
+
+  .hero-graphic { 
+    width:100%!important; 
+    display:flex!important; 
+    justify-content:center!important;
+    margin-top:-0.5rem!important;
+    margin-bottom:-1.5rem!important;
+  }
+
+  .hero-btns { width:100%!important; flex-direction:column!important; }
+  .hero-btns button { width:100%!important; }
+  .industry-grid { grid-template-columns:1fr!important; }
+  .why-grid { grid-template-columns:1fr!important; }
+  .cta-btns { flex-direction:column!important; width:100%!important; }
+  .cta-btns button { width:100%!important; }
+
+  .testi-card {
+    height: auto !important;
+    min-height: 255px !important;
+  }
+
+  .testi-card p {
+    -webkit-line-clamp: unset !important;
+  }
+}
+
+          @media(max-width:400px) {
+            .hero-graphic canvas { width:240px!important; height:304px!important; }
+          }
         `}</style>
 
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 1.5rem' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 1.25rem' }}>
 
           {/* ── HERO ── */}
-          <section style={{ paddingTop: '7rem', paddingBottom: '5rem' }}>
-            <div className="hero-flex" style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
-
-              {/* Left */}
+          <section className="hero-section">
+            <div className="hero-flex">
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="fu" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '1.25rem', letterSpacing: '0.05em' }}>
                   ✦ Flagship AI CV Builder
                 </div>
-                <h1 className="fu2" style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(2.2rem,5vw,3.6rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.05, marginBottom: '1.25rem' }}>
+                <h1 className="fu2" style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(2rem,5vw,3.6rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.05, marginBottom: '1rem' }}>
                   Sounds human.<br /><span style={{ color: '#c8ff00' }}>Written by AI.</span>
                 </h1>
-                <p className="fu3" style={{ fontSize: '1rem', color: 'rgba(240,237,232,0.5)', lineHeight: 1.75, marginBottom: '2rem', maxWidth: 480 }}>
+                <p className="fu3" style={{ fontSize: 'clamp(0.84rem,2vw,1rem)', color: 'rgba(240,237,232,0.5)', lineHeight: 1.7, marginBottom: '1.75rem', maxWidth: 480 }}>
                   Your hiring manager won't know the difference — and neither will you. ATS-ready, visa-aware, industry-specific. No em dashes. No "I am passionate about".
                 </p>
-                <div className="fu4" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <div className="fu4 hero-btns">
                   <button className="primary-btn" onClick={() => navigate('/cv-builder')}
-                    style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 100, padding: '0.9rem 2rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                    style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 100, padding: '0.85rem 1.75rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.92rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                     Build my CV →
                   </button>
                   <button className="secondary-btn" onClick={() => navigate('/cv-builder')}
-                    style={{ background: 'rgba(240,237,232,0.05)', color: '#f0ede8', border: '1px solid rgba(240,237,232,0.15)', borderRadius: 100, padding: '0.9rem 2rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '0.92rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                    style={{ background: 'rgba(240,237,232,0.05)', color: '#f0ede8', border: '1px solid rgba(240,237,232,0.15)', borderRadius: 100, padding: '0.85rem 1.75rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                     Enhance existing CV
                   </button>
                 </div>
               </div>
-
-              {/* Right — floating SVG */}
-              <div className="float" style={{ flexShrink: 0, width: 280 }}>
+              <div className="float hero-graphic">
                 <CVGraphic />
               </div>
             </div>
           </section>
 
           {/* ── STATS ── */}
-          {/* ── STATS ── */}
-<section style={{ paddingBottom: '4rem' }}>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(240,237,232,0.07)' }}>
-    {[
-      { label: 'CVs built today', value: <AnimatedNumber value={cvCount} />, bg: '#0f0f0f' },
-      { label: 'More callbacks', value: '3×', bg: '#141414' },
-      { label: 'Pass ATS screening', value: '94%', bg: '#0f0f0f' },
-    ].map((s, i) => (
-      <div key={i} style={{ background: s.bg, padding: 'clamp(1.2rem,3vw,2rem) 1rem', textAlign: 'center', borderRight: i < 2 ? '1px solid rgba(240,237,232,0.07)' : 'none' }}>
-        <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.3rem,4vw,2.6rem)', color: '#c8ff00', letterSpacing: '-0.04em', lineHeight: 1 }}>{s.value}</div>
-        <div style={{ fontSize: 'clamp(0.62rem,1.5vw,0.72rem)', color: 'rgba(240,237,232,0.4)', marginTop: '0.4rem', fontWeight: 500, lineHeight: 1.4 }}>{s.label}</div>
-      </div>
-    ))}
-  </div>
-</section>
+          <section style={{ paddingBottom: '3.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', borderRadius: 18, overflow: 'hidden', border: '1px solid rgba(240,237,232,0.07)' }}>
+              {[
+                { label: 'CVs built today', value: <AnimatedNumber value={cvCount} />, bg: '#0f0f0f' },
+                { label: 'More callbacks', value: '3×', bg: '#141414' },
+                { label: 'Pass ATS screening', value: '94%', bg: '#0f0f0f' },
+              ].map((s, i) => (
+                <div key={i} style={{ background: s.bg, padding: 'clamp(0.85rem,3vw,1.75rem) clamp(0.5rem,2vw,1rem)', textAlign: 'center', borderRight: i < 2 ? '1px solid rgba(240,237,232,0.07)' : 'none' }}>
+                  <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1rem,4vw,2.4rem)', color: '#c8ff00', letterSpacing: '-0.04em', lineHeight: 1 }}>{s.value}</div>
+                  <div style={{ fontSize: 'clamp(0.56rem,1.4vw,0.7rem)', color: 'rgba(240,237,232,0.4)', marginTop: '0.35rem', fontWeight: 500, lineHeight: 1.4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* ── HOW IT WORKS ── */}
-          <section style={{ paddingBottom: '5rem' }}>
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '1rem' }}>How it works</div>
-              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.6rem,4vw,2.4rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.1 }}>
+          <section style={{ paddingBottom: '4rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '0.85rem' }}>How it works</div>
+              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.4rem,4vw,2.2rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.15 }}>
                 From blank page to<br /><span style={{ color: '#c8ff00' }}>interview-ready in minutes</span>
               </h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: '2.5rem', maxWidth: 820, margin: '0 auto' }}>
+            <div className="steps-grid">
               <StepCard number="1" title="Fill in your details" desc="Work experience, education, skills, target role. You provide the raw material — or upload your existing CV." />
               <StepCard number="2" title="AI rewrites everything" desc="No em dashes. No corporate fluff. Active voice, achievement-focused bullets, British English. Sounds like you on your best day." />
               <StepCard number="3" title="Download and apply" desc="Copy the text or download as a clean PDF. Formatted for ATS, tailored for UK Skilled Worker visa applications." />
@@ -475,13 +520,13 @@ export default function CVLanding() {
           </section>
 
           {/* ── INDUSTRY STYLES ── */}
-          <section style={{ paddingBottom: '5rem' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '1rem' }}>Industry-specific</div>
-              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.6rem,4vw,2.4rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.1 }}>
+          <section style={{ paddingBottom: '4rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '0.85rem' }}>Industry-specific</div>
+              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.4rem,4vw,2.2rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.15 }}>
                 Built for your industry,<br /><span style={{ color: '#c8ff00' }}>not just your job title</span>
               </h2>
-              <p style={{ fontSize: '0.88rem', color: 'rgba(240,237,232,0.4)', marginTop: '0.75rem' }}>Each industry has its own language, format, and expectations. We know them all.</p>
+              <p style={{ fontSize: '0.82rem', color: 'rgba(240,237,232,0.4)', marginTop: '0.6rem' }}>Each industry has its own language, format, and expectations. We know them all.</p>
             </div>
             <div className="industry-grid">
               {industries.map((ind, i) => <IndustryCard key={i} {...ind} />)}
@@ -489,49 +534,37 @@ export default function CVLanding() {
           </section>
 
           {/* ── HIRED BY TICKER ── */}
-<section style={{ paddingBottom: '5rem' }}>
-  <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-    <p style={{ fontSize: '0.78rem', color: 'rgba(240,237,232,0.3)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-      Sponsrr CVs got candidates hired by
-    </p>
-  </div>
-
-  <div style={{ position: 'relative', overflow: 'hidden' }}>
-    {/* Fade edges */}
-    <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 80, background: 'linear-gradient(90deg, #080808, transparent)', zIndex: 2, pointerEvents: 'none' }} />
-    <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 80, background: 'linear-gradient(270deg, #080808, transparent)', zIndex: 2, pointerEvents: 'none' }} />
-
-    <div className="ticker-track">
-      {[...Array(2)].map((_, repeat) => (
-        <div key={repeat} className="ticker-inner">
-          {[
-  'google', 'amazon', 'deliveroo', 'salesforce', 'hsbc', 'lloyds',
-'pwc', 'barclays', 'johnlewis', 'boots', 'tesco', 'sainsburys', 'hm',
-'nhs', 'bupa', 'astrazeneca', 'gsk', 'sky', 'bt', 'bbc', 'dyson', 'easyjet'
-].map((name) => (
-  <div key={name} style={{ flexShrink: 0, padding: '0 2.5rem', display: 'flex', alignItems: 'center' }}>
-    <img
-      src={`/logos/${name}.png`}
-      alt={name}
-      style={{ height: 28, width: 'auto', opacity: 0.85, objectFit: 'contain' }}
-      onError={e => { e.target.style.display = 'none'; }}
-    />
-  </div>
-))}
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
+          <section style={{ paddingBottom: '4rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.7rem', color: 'rgba(240,237,232,0.3)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                Sponsrr CVs got candidates hired by
+              </p>
+            </div>
+            <div style={{ position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 60, background: 'linear-gradient(90deg, #080808, transparent)', zIndex: 2, pointerEvents: 'none' }} />
+              <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 60, background: 'linear-gradient(270deg, #080808, transparent)', zIndex: 2, pointerEvents: 'none' }} />
+              <div className="ticker-track">
+                {[...Array(2)].map((_, repeat) => (
+                  <div key={repeat} className="ticker-inner">
+                    {['google','amazon','deliveroo','salesforce','hsbc','lloyds','pwc','barclays','johnlewis','boots','tesco','sainsburys','hm','nhs','bupa','astrazeneca','gsk','sky','bt','bbc','dyson','easyjet'].map((name) => (
+                      <div key={name} style={{ flexShrink: 0, padding: '0 2.5rem', display: 'flex', alignItems: 'center' }}>
+                        <img src={`/logos/${name}.png`} alt={name} style={{ height: 26, width: 'auto', opacity: 0.85, objectFit: 'contain' }} onError={e => { e.target.style.display = 'none'; }} />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
 
           {/* ── WHY HUMAN ── */}
-          <section style={{ paddingBottom: '5rem' }}>
-            <div style={{ background: '#0d0d0d', border: '1px solid rgba(200,255,0,0.12)', borderRadius: 24, padding: '3rem 2.5rem' }}>
-              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.4rem,3vw,2rem)', letterSpacing: '-0.03em', color: '#f0ede8' }}>Why it sounds human and not ChatGPT</h2>
-                <p style={{ fontSize: '0.85rem', color: 'rgba(240,237,232,0.4)', marginTop: '0.5rem' }}>We trained our prompts to actively avoid AI writing patterns.</p>
+          <section style={{ paddingBottom: '4rem' }}>
+            <div style={{ background: '#0d0d0d', border: '1px solid rgba(200,255,0,0.12)', borderRadius: 22, padding: 'clamp(1.5rem,4vw,3rem) clamp(1.25rem,4vw,2.5rem)' }}>
+              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.2rem,3vw,1.8rem)', letterSpacing: '-0.03em', color: '#f0ede8' }}>Why it sounds human and not ChatGPT</h2>
+                <p style={{ fontSize: '0.78rem', color: 'rgba(240,237,232,0.4)', marginTop: '0.4rem' }}>We trained our prompts to actively avoid AI writing patterns.</p>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '1rem' }}>
+              <div className="why-grid">
                 {[
                   { bad: 'I am passionate about...', good: 'Opens with a hook, not a cliché' },
                   { bad: 'Responsible for managing...', good: 'Achievement-first bullet points' },
@@ -540,34 +573,30 @@ export default function CVLanding() {
                   { bad: 'Leveraging synergies', good: 'Plain English. Active voice.' },
                   { bad: 'Detail-oriented team player', good: 'Actual skills. Actual outcomes.' },
                 ].map((item, i) => (
-                  <div key={i} style={{ background: '#141414', borderRadius: 14, padding: '1.1rem' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,77,0,0.7)', textDecoration: 'line-through', marginBottom: '0.4rem', fontStyle: 'italic' }}>{item.bad}</div>
-                    <div style={{ fontSize: '0.72rem', color: '#c8ff00', fontWeight: 600 }}>✓ {item.good}</div>
+                  <div key={i} style={{ background: '#141414', borderRadius: 12, padding: '0.9rem 1rem' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'rgba(255,77,0,0.7)', textDecoration: 'line-through', marginBottom: '0.35rem', fontStyle: 'italic' }}>{item.bad}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#c8ff00', fontWeight: 600 }}>✓ {item.good}</div>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* ── TESTIMONIALS — Welcome.js style ── */}
-          <section style={{ paddingBottom: '5rem' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '1rem' }}>Real results</div>
-              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.6rem,4vw,2.4rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.1 }}>
+          {/* ── TESTIMONIALS ── */}
+          <section style={{ paddingBottom: '4rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(200,255,0,0.08)', border: '1px solid rgba(200,255,0,0.2)', padding: '0.35rem 1rem', borderRadius: '100px', fontSize: '0.72rem', color: '#c8ff00', fontWeight: 700, marginBottom: '0.85rem' }}>Real results</div>
+              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.4rem,4vw,2.2rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.15 }}>
                 People who got the job<br /><span style={{ color: '#c8ff00' }}>after using Sponsrr CV</span>
               </h2>
             </div>
-
-            <div style={{ maxWidth: 520, margin: '0 auto' }}>
-              {/* Divider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ maxWidth: 500, margin: '0 auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
                 <div style={{ flex: 1, height: 1, background: 'rgba(240,237,232,0.07)' }} />
-                <span style={{ fontSize: '0.65rem', color: 'rgba(240,237,232,0.25)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>What our users say</span>
+                <span style={{ fontSize: '0.62rem', color: 'rgba(240,237,232,0.25)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>What our users say</span>
                 <div style={{ flex: 1, height: 1, background: 'rgba(240,237,232,0.07)' }} />
               </div>
-
-              {/* Card — exactly Welcome.js style */}
-              <div className={`testi-card${animating ? ' out' : ''}`} style={{ background: '#111', border: '1px solid rgba(240,237,232,0.08)', borderRadius: 18, padding: '1.5rem', textAlign: 'left', height: 200, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div className={`testi-card${animating ? ' out' : ''}`} style={{ background: '#111', border: '1px solid rgba(240,237,232,0.08)', borderRadius: 18, padding: '1.5rem', textAlign: 'left', height: 230, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ fontSize: '1.6rem', lineHeight: 1, color: 'rgba(200,255,0,0.25)', fontFamily: 'Georgia, serif', marginBottom: '0.4rem' }}>"</div>
                   <p style={{ fontSize: '0.84rem', color: 'rgba(240,237,232,0.7)', lineHeight: 1.65, margin: 0, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -584,8 +613,6 @@ export default function CVLanding() {
                   </div>
                 </div>
               </div>
-
-              {/* Dots */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem' }}>
                 {TESTIMONIALS.map((_, i) => (
                   <button key={i} className={`dot${i === activeIdx ? ' on' : ''}`} onClick={() => goTo(i)} />
@@ -595,26 +622,26 @@ export default function CVLanding() {
           </section>
 
           {/* ── BOTTOM CTA ── */}
-          <section style={{ paddingBottom: '6rem' }}>
-            <div style={{ background: 'linear-gradient(135deg,#0f0f0f 0%,#111 50%,#0a0a0a 100%)', border: '1px solid rgba(200,255,0,0.15)', borderRadius: 24, padding: '3.5rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <section style={{ paddingBottom: '5rem' }}>
+            <div style={{ background: 'linear-gradient(135deg,#0f0f0f 0%,#111 50%,#0a0a0a 100%)', border: '1px solid rgba(200,255,0,0.15)', borderRadius: 22, padding: 'clamp(1.75rem,5vw,3.5rem) clamp(1.25rem,4vw,2rem)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 400, height: 200, background: 'radial-gradient(ellipse,rgba(200,255,0,0.06) 0%,transparent 70%)', pointerEvents: 'none' }} />
               <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✦</div>
-                <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.3rem,4vw,2.4rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.1, marginBottom: '0.75rem' }}>Your job hunt got you this far.</h2>
-                <p style={{ fontSize: '0.95rem', color: 'rgba(240,237,232,0.5)', lineHeight: 1.7, maxWidth: 440, margin: '0 auto 2rem' }}>
+                <div style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>✦</div>
+                <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 'clamp(1.2rem,4vw,2.2rem)', letterSpacing: '-0.04em', color: '#f0ede8', lineHeight: 1.1, marginBottom: '0.6rem' }}>Your job hunt got you this far.</h2>
+                <p style={{ fontSize: 'clamp(0.8rem,2vw,0.92rem)', color: 'rgba(240,237,232,0.5)', lineHeight: 1.65, maxWidth: 400, margin: '0 auto 1.5rem' }}>
                   Don't lose the job offer because your CV didn't match what a UK hiring manager actually looks for.
                 </p>
-                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div className="cta-btns">
                   <button className="primary-btn" onClick={() => navigate('/cv-builder')}
-                    style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 100, padding: '1rem 2.5rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                    style={{ background: '#c8ff00', color: '#080808', border: 'none', borderRadius: 100, padding: '0.85rem 2rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: '0.92rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                     Build my CV now →
                   </button>
                   <button className="secondary-btn" onClick={() => navigate('/cover-letter')}
-                    style={{ background: 'rgba(240,237,232,0.05)', color: '#f0ede8', border: '1px solid rgba(240,237,232,0.15)', borderRadius: 100, padding: '1rem 2rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '0.92rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                    style={{ background: 'rgba(240,237,232,0.05)', color: '#f0ede8', border: '1px solid rgba(240,237,232,0.15)', borderRadius: 100, padding: '0.85rem 1.75rem', fontFamily: 'DM Sans, sans-serif', fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                     Write my cover letter
                   </button>
                 </div>
-                <div style={{ marginTop: '1.5rem', fontSize: '0.7rem', color: 'rgba(240,237,232,0.2)' }}>Sound more like yourself. Powered by Sponsrr AI.</div>
+                <div style={{ marginTop: '1.25rem', fontSize: '0.68rem', color: 'rgba(240,237,232,0.2)' }}>Sound more like yourself. Powered by Sponsrr AI.</div>
               </div>
             </div>
           </section>
