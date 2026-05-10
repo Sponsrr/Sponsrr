@@ -372,7 +372,7 @@ export default function CVLanding() {
     { icon: '👗', title: 'Fashion & Retail', desc: 'Brand-aware language. Visual merchandising vocabulary. Built for ASOS, Burberry, Net-a-Porter.', accent: '#ffc800' },
     { icon: '🏥', title: 'Healthcare & Medical', desc: 'Clinical terminology. NMC/GMC compliant language. Structured for NHS and private healthcare.', accent: '#ffc800' },
     { icon: '⚖️', title: 'Legal & Finance', desc: 'Formal register. Jurisdiction-aware language. Structured for UK law firms and financial institutions.', accent: '#c8ff00' },
-    { icon: '✦', title: 'General & Other', desc: 'Clean, adaptable format that works across any industry. ATS-safe, sharp, and human.', accent: 'rgba(240,237,232,0.4)' },
+    { icon: '✦', title: 'General & Other', desc: 'Clean, adaptable format that works across any industry. ATS-safe, sharp, and human.', accent: '#8f8f8f' },
   ];
 
   return (
